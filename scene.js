@@ -85,11 +85,7 @@ function onMouseClick(event) {
 
 function animate() {
     headShot();
-    if (head2.position.x < 50 || head2.position.x > -50) {
-        ballVel = -ballVel;   
-    }
-    head2.position.x += ballVel;
-
+    ballMove();
     renderer.render(scene, camera)
     requestAnimationFrame(animate)
 }
@@ -121,16 +117,17 @@ document.body.addEventListener("mousedown", bonusScore);
 let ballVel = 0.01;
 
 function ballMove() {
-    // for (const target of targets) {
-    //     if (target.positionX < 50 || target.positionX > -50) {
-    //         ballVel = -ballVel
-    //     }
-    //     target.positionX += ballVel;      
-    // }      
-    if (head2.position.x < 50 || head2.position.x > -50) {
-        ballVel = -ballVel
-    }
-    head2.position.x += ballVel;
+    for (const target of targets) {
+        if (target.positionX < 50 || target.positionX > -50) {
+            ballVel = -ballVel
+        }
+        target.positionX += ballVel;      
+    }  
+    
+    // if (head2.position.x < 50 || head2.position.x > -50) {
+    //     ballVel = -ballVel
+    // }
+    // head2.position.x += ballVel;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
