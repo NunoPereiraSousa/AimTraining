@@ -101,7 +101,7 @@ function headShot() {
                 score += 1;
             }
         });
-    })        
+    })
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
