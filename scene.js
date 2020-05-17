@@ -9,6 +9,7 @@ let plane;
 let head;
 let tree;
 let targets = [];
+let house;
 // objects
 
 // Lights
@@ -50,7 +51,7 @@ window.onload = function init() {
         antialias: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor("#c4e0ba");
+    renderer.setClearColor("#971414", 5);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -84,6 +85,11 @@ function onMouseClick(event) {
 
 function animate() {
     headShot();
+    if (head2.position.x < 50 || head2.position.x > -50) {
+        ballVel = -ballVel;   
+    }
+    head2.position.x += ballVel;
+
     renderer.render(scene, camera)
     requestAnimationFrame(animate)
 }
@@ -95,6 +101,7 @@ function headShot() {
 
     intersects.forEach(intersection => {
         targets.forEach((target, i) => {
+            ballCount = targets.length - 1;
             if (intersection.object.name === target.name) {
                 scene.remove(intersection.object);
                 targets.splice(i, 1);
@@ -102,6 +109,28 @@ function headShot() {
             }
         });
     })
+}
+
+function bonusScore(event) {
+    if (event.timeStamp < 2000 && ballCount === 0) {
+        score += 10
+    }
+}
+document.body.addEventListener("mousedown", bonusScore);
+
+let ballVel = 0.01;
+
+function ballMove() {
+    // for (const target of targets) {
+    //     if (target.positionX < 50 || target.positionX > -50) {
+    //         ballVel = -ballVel
+    //     }
+    //     target.positionX += ballVel;      
+    // }      
+    if (head2.position.x < 50 || head2.position.x > -50) {
+        ballVel = -ballVel
+    }
+    head2.position.x += ballVel;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
@@ -132,7 +161,7 @@ function createObstacles() {
             color: 0xffff00
         }));
     head.visible = false;
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 1; i++) {
         head2 = head.clone();
         head2.name = `head${i + 1}`;
         head2.visible = true;
@@ -141,10 +170,14 @@ function createObstacles() {
         head2.position.set(positionX, 3, positionZ);
         targets.push({
             id: i + 1,
-            name: head2.name
+            name: head2.name,
+            positionX: head2.position.x,
+            positionZ: head2.position.z
+
         })
         scene.add(head2);
     }
+    console.table(targets)
     scene.add(head);
 }
 
@@ -186,16 +219,9 @@ function createTree() {
     positionX = Math.floor(Math.random() * (200)) - 100;
     positionZ = Math.floor(Math.random() * (100 + 20)) - 100;
 
-    // while ((house.position.x <= -5 && house.position.x >= 5) &&
-    // (house.position.z >= 5 && house.position.z <= -5)) {
-    //     tree.position.set(positionX, 0, positionZ);
-    // }
-    // tree.position.set(x, 0, z);
     tree.position.set(positionX, 0, positionZ);
 
     scene.add(tree)
-
-    return tree;
 }
 
 function createHouse() {
