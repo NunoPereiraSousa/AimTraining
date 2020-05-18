@@ -12,6 +12,12 @@ let targets = [];
 let house;
 // objects
 
+
+let intersects = null
+
+
+
+
 // Lights
 let light;
 // Lights
@@ -81,6 +87,11 @@ window.onload = function init() {
 function onMouseClick(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+
+    raycaster.setFromCamera(mouse, camera);
+
+    intersects = raycaster.intersectObjects(scene.children);
 }
 
 function animate() {
@@ -91,20 +102,23 @@ function animate() {
 }
 
 function headShot() {
-    raycaster.setFromCamera(mouse, camera);
 
-    const intersects = raycaster.intersectObjects(scene.children);
 
-    intersects.forEach(intersection => {
-        targets.forEach((target, i) => {
-            ballCount = targets.length - 1;
-            if (intersection.object.name === target.name) {
-                scene.remove(intersection.object);
-                targets.splice(i, 1);
-                score += 1;
-            }
-        });
-    })
+    if (intersects!=null) {
+        intersects.forEach(intersection => {
+            targets.forEach((target, i) => {
+                ballCount = targets.length - 1;
+                if (intersection.object.name === target.obj.name) {
+                    scene.remove(intersection.object);
+                    targets.splice(i, 1);
+                    score += 1;
+                }
+            });
+        })
+
+    }
+
+    intersects = null
 }
 
 function bonusScore(event) {
@@ -118,12 +132,12 @@ let ballVel = 0.01;
 
 function ballMove() {
     for (const target of targets) {
-        if (target.position.x < 5 || target.position.x > -5) {
-            ballVel = -ballVel
+        if (target.obj.position.x >= 20 || target.obj.position.x <= -20) {
+            target.vel = -target.vel
         }
-        target.position.x += ballVel;      
-    }  
-    
+        target.obj.position.x += target.vel;
+    }
+
     // if (head2.position.x < 50 || head2.position.x > -50) {
     //     ballVel = -ballVel
     // }
@@ -162,8 +176,20 @@ function createObstacles() {
         positionX = Math.floor(Math.random() * (40)) - 20;
         positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
         head.position.set(positionX, 3, positionZ);
-        targets.push(head)
-        scene.add(head);
+        targets.push({
+            obj: head,
+            vel: 0.01
+        })
+
+
+
+
+    }
+
+
+    for (const target of targets) {
+        console.log(target.obj.name)
+        scene.add(target.obj);
     }
     console.table(targets)
 }
