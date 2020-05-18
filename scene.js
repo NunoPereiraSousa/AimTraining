@@ -118,10 +118,10 @@ let ballVel = 0.01;
 
 function ballMove() {
     for (const target of targets) {
-        if (target.positionX < 50 || target.positionX > -50) {
+        if (target.position.x < 5 || target.position.x > -5) {
             ballVel = -ballVel
         }
-        target.positionX += ballVel;      
+        target.position.x += ballVel;      
     }  
     
     // if (head2.position.x < 50 || head2.position.x > -50) {
@@ -152,30 +152,20 @@ function createLights() {
 }
 
 function createObstacles() {
-    head = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 32, 32),
-        new THREE.MeshBasicMaterial({
-            color: 0xffff00
-        }));
-    head.visible = false;
-    for (let i = 0; i < 1; i++) {
-        head2 = head.clone();
-        head2.name = `head${i + 1}`;
-        head2.visible = true;
+    for (let i = 0; i < 2; i++) {
+        head = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: 0xffff00
+            }));
+        head.name = `head${i + 1}`
         positionX = Math.floor(Math.random() * (40)) - 20;
         positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
-        head2.position.set(positionX, 3, positionZ);
-        targets.push({
-            id: i + 1,
-            name: head2.name,
-            positionX: head2.position.x,
-            positionZ: head2.position.z
-
-        })
-        scene.add(head2);
+        head.position.set(positionX, 3, positionZ);
+        targets.push(head)
+        scene.add(head);
     }
     console.table(targets)
-    scene.add(head);
 }
 
 function createTree() {
