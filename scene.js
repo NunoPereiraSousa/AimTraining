@@ -9,13 +9,48 @@ let plane;
 let head;
 let tree;
 let targets = [];
+let civil;
+let civilians = []
 let house;
 // objects
+// level
+let level = 1
+// level 
+
+// targets speed 
+let speed = {
+    min: 0.01,
+    max: 0.02,
+}
+// targets speed
 
 
+// counters
+let civilCount = 0
+let ballCount = 0
+// counters 
+
+// objects that have been intercepted (by mouse click)
 let intersects = null
+//  objects that have been intercepted
 
 
+// player
+let player = {
+    name: null, // future change
+    shot: level * 2 + 10,
+    kill: 0,
+    civilianKill: 0,
+    points: 0,
+    maxLevel: level
+}
+// player
+
+
+
+// gameController
+stopLoop = false
+// gameController
 
 
 // Lights
@@ -37,7 +72,7 @@ let material = [
 let score = 0;
 // Score
 
-window.addEventListener("mousedown", onMouseClick, false);
+window.addEventListener("mousedown", bonusScore, false);
 
 window.onload = function init() {
     //scene
@@ -77,6 +112,7 @@ window.onload = function init() {
     createLights();
     createPlane();
     createObstacles();
+    createCivil()
     createHouse();
 
     animate();
@@ -85,6 +121,7 @@ window.onload = function init() {
 //+ -------------------- ESSENTIAL FUNCTIONS
 
 function onMouseClick(event) {
+    console.log('here1');
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -92,41 +129,79 @@ function onMouseClick(event) {
     raycaster.setFromCamera(mouse, camera);
 
     intersects = raycaster.intersectObjects(scene.children);
+
+    player.shot -= 1
 }
 
 function animate() {
     headShot();
     ballMove();
+    levelUp()
     renderer.render(scene, camera)
-    requestAnimationFrame(animate)
+    if (stopLoop == false) {
+        requestAnimationFrame(animate)
+    }
+
 }
 
 function headShot() {
 
+    countTarget()
 
-    if (intersects!=null) {
+    if (intersects != null) {
         intersects.forEach(intersection => {
             targets.forEach((target, i) => {
-                ballCount = targets.length - 1;
+
                 if (intersection.object.name === target.obj.name) {
                     scene.remove(intersection.object);
-                    targets.splice(i, 1);
-                    score += 1;
+                    if (target.objType == "civil") {
+                        player.civilianKill++
+                        if (score > 1) {
+                            score -= 2;
+                        } else if (score == 1) {
+                            score = 0
+                        }
+                    } else if (target.objType == "hostile") {
+                        player.kill++
+                        score += 1;
+                    }
+                    target.dead = true
+                    targets.splice(i, 1); // Remove de deaths
                 }
             });
         })
-
     }
-
+    console.log(score);
     intersects = null
 }
 
+
+
+function countTarget() {
+    civilCount = 0
+    ballCount = 0
+    for (const target of targets) {
+        if (target.objType == "civil") {
+            civilCount++
+        } else {
+            ballCount++
+        }
+    }
+    // civilCount -= (1 * level)
+    // ballCount -= (1 * level)
+
+}
+// Todo 
 function bonusScore(event) {
-    if (event.timeStamp < 2000 && ballCount === 0) {
+    countTarget()
+    console.log('here2');
+    // console.log(`Ali :${ballCount}`);
+
+    if (event.timeStamp < 2000 * level && ballCount - 1 === 0) {
         score += 10
     }
 }
-document.body.addEventListener("mousedown", bonusScore);
+document.body.addEventListener("mousedown", onMouseClick);
 
 let ballVel = 0.01;
 
@@ -137,11 +212,6 @@ function ballMove() {
         }
         target.obj.position.x += target.vel;
     }
-
-    // if (head2.position.x < 50 || head2.position.x > -50) {
-    //     ballVel = -ballVel
-    // }
-    // head2.position.x += ballVel;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
@@ -165,34 +235,66 @@ function createLights() {
     scene.add(light)
 }
 
+
+
+// Todo <
+/**
+ * *Create hostiles
+ */
 function createObstacles() {
-    for (let i = 0; i < 2; i++) {
-        head = new THREE.Mesh(
-            new THREE.SphereGeometry(1, 32, 32),
-            new THREE.MeshBasicMaterial({
-                color: 0xffff00
-            }));
+    for (let i = 0; i < 2 * level; i++) {
+        let dir = Math.random() * (1 - (-1)) + -1, //!directions
+            head = new THREE.Mesh(
+                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffff00
+                }));
         head.name = `head${i + 1}`
         positionX = Math.floor(Math.random() * (40)) - 20;
         positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
         head.position.set(positionX, 3, positionZ);
         targets.push({
             obj: head,
-            vel: 0.01
+            vel: (Math.random() * (speed.max - speed.min) + speed.min) * dir,
+            objType: "hostile",
         })
-
-
-
-
     }
-
 
     for (const target of targets) {
-        console.log(target.obj.name)
         scene.add(target.obj);
     }
-    console.table(targets)
+
 }
+
+/**
+ * * function that create civilians
+ */
+function createCivil() {
+
+    for (let i = 0; i < 2; i++) {
+        let dir = Math.random() * (1 - (-1)) + -1,
+            civil = new THREE.Mesh(
+                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.MeshBasicMaterial({
+                    color: "blue"
+                }));
+        civil.name = `civil${i + 1}`
+        positionX = Math.floor(Math.random() * (40)) - 20;
+        positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
+        civil.position.set(positionX, 3, positionZ);
+        targets.push({
+            obj: civil,
+            vel: 0.02 * dir,
+            objType: "civil",
+            // dead: false
+        })
+    }
+
+    for (const civil of targets) {
+        scene.add(civil.obj);
+    }
+}
+// Todo >
 
 function createTree() {
     tree = new THREE.Object3D();
@@ -288,3 +390,66 @@ function randomGreenColor() {
 }
 
 //* -------------------- HELPING FUNCTIONS
+
+
+
+function levelUp() {
+
+
+    if (inGame()) {
+        if (ballCount == 0) {
+            console.log("fuck it I am Up")
+            level++
+            player.maxLevel = level
+            playerReload()
+            for (let j = 0; j < targets.length; j++) {
+                for (let i = scene.children.length - 1; i > 0; i--) {
+                    if (scene.children[i].name == targets[j].obj.name) {
+                        scene.remove(scene.getObjectByName(scene.children[i].name));
+                    }
+                }
+            }
+            targets = []
+            if (speed.max < 10) {
+                speed.max += 0.02
+            }
+
+            createObstacles()
+            createCivil()
+        }
+    } else {
+        alert(`Game over`)
+        stopLoop = true
+    }
+
+
+}
+
+function removeEntity(object) {
+    var selectedObject = scene.getObjectByName(object.name);
+    scene.remove(selectedObject);
+    animate();
+}
+/**
+ * Function that reloads the players gun
+ */
+function playerReload() {
+    player.shot = level * 2 + 10
+}
+
+/**
+ * Function that confirms if the players continues in the game or not 
+ */
+function inGame() {
+    if (player.civilianKill == 5) {
+        return false
+    }
+
+    if (player.shot == 0) {
+        return false
+    }
+
+
+    return true
+
+}
