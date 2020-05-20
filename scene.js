@@ -81,13 +81,14 @@ let material = [
 
 // Score
 let score = 0;
+let textScore = document.createElement('p');
 // Score
 
 
 
 
 //   text
-let textGeometry 
+let textGeometry
 //  text
 
 window.addEventListener("mousedown", bonusScore, false);
@@ -132,41 +133,30 @@ window.onload = function init() {
     createObstacles();
     createCivil()
     createHouse();
+    textStyle();
 
     display = 30
 
-
-    // var loader = new THREE.FontLoader();
-
-    // loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
-
-    //     textGeometry = new THREE.TextGeometry('Hello three.js!', {
-    //         font: font,
-    //         size: 80,
-    //         height: 5,
-    //         curveSegments: 12,
-    //         bevelEnabled: true,
-    //         bevelThickness: 10,
-    //         bevelSize: 8,
-    //         bevelOffset: 0,
-    //         bevelSegments: 5
-    //     });
-    // });
-
-
-    // var textMaterial = new THREE.MeshPhongMaterial({
-    //     color: 0xff0000,
-    //     specular: 0xffffff
-    // });
-
-    // var text = new THREE.Mesh(textGeometry, textMaterial);
-
-    // scene.add(text);
-
-
-
     startTimer()
     animate();
+}
+
+function textStyle() {
+    textScore.style.position = 'absolute';
+    textScore.style.width = 100;
+    textScore.style.height = 100;
+    textScore.style.top = 50 + 'px';
+    textScore.style.left = 70 + 'px';
+    textScore.style.color = "#fefefa";
+    textScore.style.fontSize = 1.4 + "em"
+    document.body.appendChild(textScore);
+}
+
+function toXYCoords(pos) {
+    var vector = projector.projectVector(pos.clone(), camera);
+    vector.x = (vector.x + 1) / 2 * window.innerWidth;
+    vector.y = -(vector.y - 1) / 2 * window.innerHeight;
+    return vector;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
@@ -182,9 +172,11 @@ function onMouseClick(event) {
 function animate() {
     headShot();
     ballMove();
-    levelUp()
+    levelUp();
+    updateSensivity();
+    textScore.innerHTML = `Score: ${score}`;
+
     renderer.render(scene, camera)
-    console.log(display);
 
     if (stopLoop == false) {
         requestAnimationFrame(animate)
@@ -250,7 +242,7 @@ function bonusScore(event) {
 
 
 
-    if (event.timeStamp < 2000 * level && ballCount - 1 === 0) {
+    if (event.timeStamp < 3000 * level && ballCount - 1 === 0) {
         score += 10
     }
 }
@@ -265,6 +257,15 @@ function ballMove() {
         }
         target.obj.position.x += target.vel;
     }
+}
+
+function updateSensivity() {
+    let y = mouse.y * 100;
+    mouse.y += (y - mouse.y + 100) * 0.06;
+    mouse.z = (y - mouse.y + 100) * 0.01;
+    console.log(mouse.y);
+    
+    // plane.position.x = targetX;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
