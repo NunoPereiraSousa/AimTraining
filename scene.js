@@ -44,6 +44,8 @@ let player = {
     points: 0,
     maxLevel: level
 }
+let bulletText = document.createElement('p');
+
 // player
 
 
@@ -83,13 +85,6 @@ let material = [
 let score = 0;
 let textScore = document.createElement('p');
 // Score
-
-
-
-
-//   text
-let textGeometry
-//  text
 
 window.addEventListener("mousedown", bonusScore, false);
 
@@ -150,6 +145,15 @@ function textStyle() {
     textScore.style.color = "#fefefa";
     textScore.style.fontSize = 1.4 + "em"
     document.body.appendChild(textScore);
+
+    bulletText.style.position = 'absolute';
+    bulletText.style.width = 100;
+    bulletText.style.height = 100;
+    bulletText.style.top = 100 + 'px';
+    bulletText.style.left = 70 + 'px';
+    bulletText.style.color = "#fefefa";
+    bulletText.style.fontSize = 1.4 + "em"
+    document.body.appendChild(bulletText);
 }
 
 function toXYCoords(pos) {
@@ -175,6 +179,7 @@ function animate() {
     levelUp();
     updateSensivity();
     textScore.innerHTML = `Score: ${score}`;
+    bulletText.innerHTML = `Bullets: ${player.shot}`;
 
     renderer.render(scene, camera)
 
