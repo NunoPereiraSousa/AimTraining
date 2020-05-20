@@ -13,6 +13,7 @@ let civil;
 let civilians = []
 let house;
 // objects
+
 // level
 let level = 1
 // level 
@@ -23,7 +24,6 @@ let speed = {
     max: 0.02,
 }
 // targets speed
-
 
 // counters
 let civilCount = 0
@@ -45,6 +45,11 @@ let player = {
     maxLevel: level
 }
 // player
+
+
+// three
+let trees = []
+// three
 
 
 
@@ -71,6 +76,7 @@ let material = [
 // Score
 let score = 0;
 // Score
+
 
 window.addEventListener("mousedown", bonusScore, false);
 
@@ -128,7 +134,14 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    intersects = raycaster.intersectObjects(scene.children);
+    intersects = raycaster.intersectObjects(scene.children, true);
+    console.log(intersects);
+
+
+
+    // console.log(scene.getObjectByName("tree"))
+    console.log(scene);
+
 
     player.shot -= 1
 }
@@ -146,11 +159,17 @@ function animate() {
 
 function headShot() {
 
+
     countTarget()
 
     if (intersects != null) {
+
+
+        // obstacleConfirm()
         intersects.forEach(intersection => {
             targets.forEach((target, i) => {
+                // console.log(scene);
+
 
                 if (intersection.object.name === target.obj.name) {
                     scene.remove(intersection.object);
@@ -171,7 +190,7 @@ function headShot() {
             });
         })
     }
-    console.log(score);
+    // console.log(score);
     intersects = null
 }
 
@@ -263,7 +282,6 @@ function createObstacles() {
     for (const target of targets) {
         scene.add(target.obj);
     }
-
 }
 
 /**
@@ -296,7 +314,7 @@ function createCivil() {
 }
 // Todo >
 
-function createTree() {
+function createTree(i) {
     tree = new THREE.Object3D();
 
     let trunk = new THREE.Mesh(
@@ -335,8 +353,18 @@ function createTree() {
     positionZ = Math.floor(Math.random() * (100 + 20)) - 100;
 
     tree.position.set(positionX, 0, positionZ);
+    tree.name = `tree`
+
+    // trees.push({
+    //     obj: tree,
+    // })'
+
+
+    console.log(tree.name)
 
     scene.add(tree)
+
+
 }
 
 function createHouse() {
@@ -398,7 +426,7 @@ function levelUp() {
 
     if (inGame()) {
         if (ballCount == 0) {
-            console.log("fuck it I am Up")
+            // console.log("fuck it I am Up")
             level++
             player.maxLevel = level
             playerReload()
@@ -448,8 +476,35 @@ function inGame() {
     if (player.shot == 0) {
         return false
     }
-
-
     return true
+}
+
+
+
+/**
+ * Function that confirms in front obstacles
+ */
+function obstacleConfirm() {
+    let intersects2 = []
+
+    for (let i = 0; i < intersects.object.length; i++) {
+        for (const target of targets) {
+            if (intersects[i].object.name === target.obj.name) {
+                for (const obstacle of intersects.object) {
+                    if (obstacle.parent.name == 'tree') {
+                        if (obstacle.position.x != target.position.x && obstacle.position.z < target.position.z) {
+                            intersects2.push(intersects[i])
+                        }
+                    }
+                }
+
+            } else {
+                intersects2.push(intersects[i])
+            }
+        }
+    }
+
+
+    intersects = intersects2
 
 }
