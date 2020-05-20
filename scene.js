@@ -52,6 +52,12 @@ let trees = []
 // three
 
 
+//  timer
+let timer = null
+let display = 0
+//  timer
+
+
 
 // gameController
 stopLoop = false
@@ -77,6 +83,12 @@ let material = [
 let score = 0;
 // Score
 
+
+
+
+//   text
+let textGeometry 
+//  text
 
 window.addEventListener("mousedown", bonusScore, false);
 
@@ -121,28 +133,49 @@ window.onload = function init() {
     createCivil()
     createHouse();
 
+    display = 30
+
+
+    // var loader = new THREE.FontLoader();
+
+    // loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
+
+    //     textGeometry = new THREE.TextGeometry('Hello three.js!', {
+    //         font: font,
+    //         size: 80,
+    //         height: 5,
+    //         curveSegments: 12,
+    //         bevelEnabled: true,
+    //         bevelThickness: 10,
+    //         bevelSize: 8,
+    //         bevelOffset: 0,
+    //         bevelSegments: 5
+    //     });
+    // });
+
+
+    // var textMaterial = new THREE.MeshPhongMaterial({
+    //     color: 0xff0000,
+    //     specular: 0xffffff
+    // });
+
+    // var text = new THREE.Mesh(textGeometry, textMaterial);
+
+    // scene.add(text);
+
+
+
+    startTimer()
     animate();
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
 
 function onMouseClick(event) {
-    console.log('here1');
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-
     raycaster.setFromCamera(mouse, camera);
-
     intersects = raycaster.intersectObjects(scene.children, true);
-    console.log(intersects);
-
-
-
-    // console.log(scene.getObjectByName("tree"))
-    console.log(scene);
-
-
     player.shot -= 1
 }
 
@@ -151,6 +184,8 @@ function animate() {
     ballMove();
     levelUp()
     renderer.render(scene, camera)
+    console.log(display);
+
     if (stopLoop == false) {
         requestAnimationFrame(animate)
     }
@@ -164,16 +199,15 @@ function headShot() {
 
     if (intersects != null) {
 
-
-        // obstacleConfirm()
+        obstacleConfirm()
+        humanShieldConfirm()
         intersects.forEach(intersection => {
             targets.forEach((target, i) => {
-                // console.log(scene);
-
 
                 if (intersection.object.name === target.obj.name) {
                     scene.remove(intersection.object);
                     if (target.objType == "civil") {
+                        display -= (3 + level)
                         player.civilianKill++
                         if (score > 1) {
                             score -= 2;
@@ -213,8 +247,8 @@ function countTarget() {
 // Todo 
 function bonusScore(event) {
     countTarget()
-    console.log('here2');
-    // console.log(`Ali :${ballCount}`);
+
+
 
     if (event.timeStamp < 2000 * level && ballCount - 1 === 0) {
         score += 10
@@ -253,7 +287,6 @@ function createLights() {
     light = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(light)
 }
-
 
 
 // Todo <
@@ -355,12 +388,7 @@ function createTree(i) {
     tree.position.set(positionX, 0, positionZ);
     tree.name = `tree`
 
-    // trees.push({
-    //     obj: tree,
-    // })'
 
-
-    console.log(tree.name)
 
     scene.add(tree)
 
@@ -418,18 +446,17 @@ function randomGreenColor() {
 }
 
 //* -------------------- HELPING FUNCTIONS
-
-
-
 function levelUp() {
+
 
 
     if (inGame()) {
         if (ballCount == 0) {
-            // console.log("fuck it I am Up")
+
             level++
             player.maxLevel = level
             playerReload()
+            levelTimer()
             for (let j = 0; j < targets.length; j++) {
                 for (let i = scene.children.length - 1; i > 0; i--) {
                     if (scene.children[i].name == targets[j].obj.name) {
@@ -448,6 +475,7 @@ function levelUp() {
     } else {
         alert(`Game over`)
         stopLoop = true
+        stopTimer()
     }
 
 
@@ -469,6 +497,11 @@ function playerReload() {
  * Function that confirms if the players continues in the game or not 
  */
 function inGame() {
+
+    if (display <= 0) {
+        return false
+    }
+
     if (player.civilianKill == 5) {
         return false
     }
@@ -479,32 +512,98 @@ function inGame() {
     return true
 }
 
-
-
 /**
  * Function that confirms in front obstacles
  */
 function obstacleConfirm() {
-    let intersects2 = []
+    let intersects2 = [] // save all the trees that are possible obstacles
+    let intersects3 = [] // save all interception that are targets
 
-    for (let i = 0; i < intersects.object.length; i++) {
+    //  gets all the trees that have been touched bhy the mouse
+    for (const intersect of intersects) {
+        if (intersect.object.parent.name === "tree") {
+            intersects2.push(intersect)
+        }
+    }
+    //  >
+    //  <confirm all targets that are behind an tree 
+    for (const intersect of intersects) {
         for (const target of targets) {
-            if (intersects[i].object.name === target.obj.name) {
-                for (const obstacle of intersects.object) {
-                    if (obstacle.parent.name == 'tree') {
-                        if (obstacle.position.x != target.position.x && obstacle.position.z < target.position.z) {
-                            intersects2.push(intersects[i])
-                        }
+            if (target.obj.name === intersect.object.name) {
+                let push = true // confirms if you can [push it in
+                for (let i = 0; i < intersects2.length; i++) {
+                    if (intersects2[i].object.parent.position.z > intersect.object.position.z) {
+                        push = false
+                        break;
                     }
                 }
-
-            } else {
-                intersects2.push(intersects[i])
+                if (push == true) {
+                    intersects3.push(intersect)
+                }
             }
         }
     }
+    // confirm all targets that are behind an tree>
+
+    intersects = [] // global 
+    intersects = intersects3 // you just need the targets not all the objects that where in the way of the mouse click
+}
 
 
+/**
+ * Function that confirms if there is an target in front of another target (human shield) 
+ */
+function humanShieldConfirm() {
+    let intersects2 = [] // save all the obstacles that are not protected by other
+
+    for (let i = 0; i < intersects.length; i++) {
+        let push = true
+        for (let j = 0; j < intersects.length; j++) {
+
+            if (intersects[j].object.name !== intersects[i].object.name) {
+                if (intersects[j].object.position.z > intersects[i].object.position.z) {
+                    push = false
+                    break
+                }
+            }
+
+        }
+        if (push == true) {
+            intersects2.push(intersects[i])
+        }
+    }
+
+    intersects = []
     intersects = intersects2
+}
 
+/**
+ * Function that add a timer to the system 
+ * if the time in the timer = 0 the player loses 
+ */
+
+function startTimer() {
+    // alert('invoked')
+    timer = window.setTimeout(
+        function () {
+            display--
+            stopTimer()
+
+        }, 1000);
+}
+/**
+ * Function that stops the timer
+ */
+function stopTimer() {
+    clearTimeout(timer)
+    startTimer()
+}
+
+
+
+/**
+ * Function that alter changes de "Time that the person need to complete an level"
+ */
+function levelTimer() {
+    display += (5 + level)
 }
