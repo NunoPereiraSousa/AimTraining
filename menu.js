@@ -27,41 +27,33 @@ window.onload = function init() {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    // camera
-
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 15000);
     camera.position.z = 250;
 
-    // scene
-
     scene = new THREE.Scene();
     scene.background = new THREE.Color().setHSL(0.51, 0.4, 0.01);
-    scene.fog = new THREE.Fog(scene.background, 3500, 15000);
-
-
-    // world
+    scene.fog = new THREE.Fog(scene.background, 3500, 20000);
 
     for (let i = 0; i < 800; i++) {
-        let mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(200, 200, 200),
+        let cube = new THREE.Mesh(new THREE.BoxBufferGeometry(200, 200, 200),
             new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0xffffff,
                 shininess: 50
             }));
 
-        mesh.position.x = 4000 * (2.0 * Math.random() - 1.0);
-        mesh.position.y = 4000 * (2.0 * Math.random() - 1.0);
-        mesh.position.z = 4000 * (2.0 * Math.random() - 1.0);
+        cube.position.x = 4000 * (2.0 * Math.random() - 1.0);
+        cube.position.y = 4000 * (2.0 * Math.random() - 1.0);
+        cube.position.z = 4000 * (2.0 * Math.random() - 1.0);
 
-        mesh.rotation.x = Math.random() * Math.PI;
-        mesh.rotation.y = Math.random() * Math.PI;
-        mesh.rotation.z = Math.random() * Math.PI;
+        cube.rotation.x = Math.random() * Math.PI;
+        cube.rotation.y = Math.random() * Math.PI;
+        cube.rotation.z = Math.random() * Math.PI;
 
-        mesh.matrixAutoUpdate = false;
-        mesh.updateMatrix();
+        cube.matrixAutoUpdate = false;
+        cube.updateMatrix();
 
-        scene.add(mesh);
-
+        scene.add(cube);
     }
 
     for (var i = 0; i < 1; i++) {
@@ -84,16 +76,7 @@ window.onload = function init() {
         game.updateMatrix();
 
         scene.add(game);
-
     }
-
-
-    // lights
-
-    var dirLight = new THREE.DirectionalLight(0xffffff, 0.05);
-    dirLight.position.set(0, -1, 0).normalize();
-    dirLight.color.setHSL(0.1, 0.7, 0.5);
-    scene.add(dirLight);
 
     addLight(0.55, 0.9, 0.5, 5000, 0, -1000);
     addLight(0.08, 0.8, 0.5, 0, 0, -1000);
@@ -120,7 +103,7 @@ window.onload = function init() {
     // instructions - end fly controls
 
     // instructions - end dom elements
-    const domEvents = new THREEx.DomEvents(camera, renderer.container);    
+    const domEvents = new THREEx.DomEvents(camera, renderer.container);
     domEvents.addEventListener(game, "dblclick", startGame)
     // instructions - end dom elements
 
@@ -140,6 +123,10 @@ function animate() {
 }
 
 function addLight(h, s, l, x, y, z) {
+    let dirLight = new THREE.DirectionalLight(0xffffff, 0.05);
+    dirLight.position.set(0, -1, 0).normalize();
+    dirLight.color.setHSL(0.1, 0.7, 0.5);
+    scene.add(dirLight);
 
     // lensflares
     let textureLoader = new THREE.TextureLoader();
@@ -165,7 +152,6 @@ function render() {
 
     controls.update(delta);
     renderer.render(scene, camera);
-
 }
 
 function startGame() {
