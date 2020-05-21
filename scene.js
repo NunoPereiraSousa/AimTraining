@@ -87,6 +87,7 @@ let textScore = document.createElement('p');
 // Score
 
 window.addEventListener("mousedown", bonusScore, false);
+window.addEventListener("resize", responsiveScene);
 
 window.onload = function init() {
     //scene
@@ -177,7 +178,6 @@ function animate() {
     headShot();
     ballMove();
     levelUp();
-    updateSensivity();
     textScore.innerHTML = `Score: ${score}`;
     bulletText.innerHTML = `Bullets: ${player.shot}`;
 
@@ -264,27 +264,34 @@ function ballMove() {
     }
 }
 
-function updateSensivity() {
-    let y = mouse.y * 100;
-    mouse.y += (y - mouse.y + 100) * 0.06;
-    mouse.z = (y - mouse.y + 100) * 0.01;
-    console.log(mouse.y);
-    
+var lastmousex = -1;
+var lastmousey = -1;
+var lastmousetime;
+var mousetravel = 0;
+window.addEventListener("mousemove", updateSensitivity)
+
+function updateSensitivity(e) {
+    var mousex = e.pageX;
+    var mousey = e.pageY;
+    if (lastmousex > -1)
+        mousetravel += Math.max(Math.abs(mousex - lastmousex), Math.abs(mousey - lastmousey));
+    lastmousex = mousex;
+    lastmousey = mousey;
+    return
     // plane.position.x = targetX;
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
 
 //? -------------------- CREATING/ MODELING OBJECTS
-
+let mountains = []
 function createPlane() {
     plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(300, 300),
+        new THREE.PlaneGeometry(300, 300, 10, 10),
         new THREE.MeshBasicMaterial({
             color: 0x9b7653,
             side: THREE.DoubleSide
         }));
-    plane.position.set(0, 0, 0)
     plane.rotateX(Math.PI / 2)
     scene.add(plane);
 }
@@ -449,6 +456,14 @@ function randomGreenColor() {
     let min = 90;
     let green = Math.floor(Math.random() * (max - min + 1)) + min;
     return `rgb(0, ${green}, 0)`
+}
+
+function responsiveScene() {
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
 }
 
 //* -------------------- HELPING FUNCTIONS
