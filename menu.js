@@ -155,5 +155,5 @@ function render() {
 }
 
 function startGame() {
-    window.location.href = "/game.html";
+    window.location.href = "game.html";
 }
