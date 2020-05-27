@@ -42,7 +42,12 @@ let player = {
     kill: 0,
     civilianKill: 0,
     points: 0,
-    maxLevel: level
+    maxLevel: level,
+    pos: {
+        x: 0,
+        y: 5,
+        z: 55
+    }
 }
 let bulletText = document.createElement('p');
 
@@ -80,6 +85,15 @@ let material = [
     }), // green
 ];
 // Materials
+
+
+
+// player Movement
+
+let keys = []
+let angle = 0
+
+// Player Movement
 
 // Score
 let score = 0;
@@ -133,6 +147,11 @@ window.onload = function init() {
 
     display = 30
 
+
+    document.addEventListener("keydown", keyPressed);
+    document.addEventListener('keyup', keyReleased);
+
+
     startTimer()
     animate();
 }
@@ -178,6 +197,7 @@ function animate() {
     headShot();
     ballMove();
     levelUp();
+    movePLayer()
     textScore.innerHTML = `Score: ${score}`;
     bulletText.innerHTML = `Bullets: ${player.shot}`;
 
@@ -285,6 +305,7 @@ function updateSensitivity(e) {
 
 //? -------------------- CREATING/ MODELING OBJECTS
 let mountains = []
+
 function createPlane() {
     plane = new THREE.Mesh(
         new THREE.PlaneGeometry(300, 300, 10, 10),
@@ -627,4 +648,127 @@ function stopTimer() {
  */
 function levelTimer() {
     display += (5 + level)
+}
+
+
+
+
+/**
+ * Function related to the press of the keys
+ */
+// key down handling 
+function keyPressed(event) {
+    keys[event.keyCode] = true
+}
+
+
+// Key up handling 
+function keyReleased() {
+    keys[event.keyCode] = false
+}
+
+
+
+function movePLayer() {
+    // * <Car related
+    let speed = 0.5
+    // let obj = confirmTransition()
+
+
+    // console.log(obj);
+
+
+    //  W
+    if (keys[87] == true) {
+        camera.position.z -= speed * Math.cos(camera.rotation.y)
+        camera.position.x -= speed * Math.sin(camera.rotation.y)
+        console.log(camera.position.z);
+
+    }
+    // S 
+    if (keys[83] == true) {
+        camera.position.z -= speed * -Math.cos(camera.rotation.y)
+        camera.position.x -= speed * -Math.sin(camera.rotation.y)
+    }
+    // A
+    if (keys[65] == true) {
+        camera.position.z -= speed * -Math.sin(camera.rotation.y)
+        camera.position.x -= speed * Math.cos(camera.rotation.y)
+    }
+    // D
+    if (keys[68] == true) {
+        camera.position.z -= speed * Math.sin(camera.rotation.y)
+        camera.position.x -= speed * -Math.cos(camera.rotation.y)
+    }
+
+
+    //   left
+    if (keys[81] == true) {
+        camera.rotation.y += Math.PI * 0.01
+    }
+
+
+    //   right
+    if (keys[69] == true) {
+        camera.rotation.y -= Math.PI * 0.01
+    }
+
+}
+
+// function confirmTransition() {
+//     let speed = 0.5
+//     let obj = {
+//         w: true,
+//         s: true,
+//         a: true,
+//         d: true
+
+//     }
+
+
+
+//     // alert(Math.cos(camera.rotation.y))
+
+
+//     // let countW = camera.position.z - 0.5 * Math.cos(camera.rotation.y)
+
+//     // alert(countW)
+
+
+
+//     // if (countW <= 45) {
+
+//     //     obj.w == false
+//     // }
+
+//     if (camera.position.z -= speed * -Math.cos(camera.rotation.y) <= 45) {
+//         obj.s == false
+//     }
+//     if (camera.position.z -= speed * -Math.sin(camera.rotation.y) <= 45) {
+//         obj.a == false
+//     }
+//     if (camera.position.z -= speed * Math.sin(camera.rotation.y) <= 45) {
+//         obj.d == false
+//     }
+
+
+//     return obj
+
+// }
+
+
+
+
+
+
+
+
+
+
+function changeCamera() {
+    camera.position.set(player.pos.x, 5, player.pos.z)
+
+    // camera.rotation.y = (angle)
+
+
 }
