@@ -89,11 +89,15 @@ let material = [
 
 
 // player Movement
-
 let keys = []
 let angle = 0
-
 // Player Movement
+
+
+
+// scope
+let scope = null
+// scope
 
 // Score
 let score = 0;
@@ -144,6 +148,7 @@ window.onload = function init() {
     createCivil()
     createHouse();
     textStyle();
+    addScope()
 
     display = 30
 
@@ -193,6 +198,26 @@ function onMouseClick(event) {
     player.shot -= 1
 }
 
+function onMouseMove(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    scope.position.x = mouse.x * 45
+    scope.position.y = mouse.y * 23
+    scope.position.z = 
+
+    camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
+
+
+}
+
+
+
+
+
+
 function animate() {
     headShot();
     ballMove();
@@ -202,6 +227,7 @@ function animate() {
     bulletText.innerHTML = `Bullets: ${player.shot}`;
 
     renderer.render(scene, camera)
+    console.log(camera.rotation.y);
 
     if (stopLoop == false) {
         requestAnimationFrame(animate)
@@ -241,7 +267,7 @@ function headShot() {
             });
         })
     }
-    // console.log(score);
+
     intersects = null
 }
 
@@ -272,6 +298,7 @@ function bonusScore(event) {
     }
 }
 document.body.addEventListener("mousedown", onMouseClick);
+document.addEventListener("mousemove", onMouseMove, false);
 
 let ballVel = 0.01;
 
@@ -675,19 +702,21 @@ function movePLayer() {
     let obj = confirmTransition()
 
 
-    // console.log(obj);
+
 
 
     //  W
     if (keys[87] == true && obj.w == true) {
         camera.position.z -= speed * Math.cos(camera.rotation.y)
         camera.position.x -= speed * Math.sin(camera.rotation.y)
+        scope.position.z -= speed * Math.cos(camera.rotation.y)
         // console.log(camera.position.z);
     }
     // S 
     if (keys[83] == true && obj.s) {
         camera.position.z -= speed * -Math.cos(camera.rotation.y)
         camera.position.x -= speed * -Math.sin(camera.rotation.y)
+        scope.position.z -= speed * -Math.cos(camera.rotation.y)
     }
     // A
     if (keys[65] == true && obj.a) {
@@ -787,11 +816,15 @@ function confirmTransition() {
 
 
 
-
-function changeCamera() {
-    camera.position.set(player.pos.x, 5, player.pos.z)
-
-    // camera.rotation.y = (angle)
-
-
+// ! <testes
+function addScope() {
+    let targetGeometry = new THREE.CircleGeometry(1, 32);
+    let targetMaterial = new THREE.MeshBasicMaterial({
+        color: "green"
+    });
+    scope = new THREE.Mesh(targetGeometry, targetMaterial);
+    scope.name = `scope`
+    scene.add(scope);
 }
+
+// !testes > 
