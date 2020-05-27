@@ -672,31 +672,30 @@ function keyReleased() {
 function movePLayer() {
     // * <Car related
     let speed = 0.5
-    // let obj = confirmTransition()
+    let obj = confirmTransition()
 
 
     // console.log(obj);
 
 
     //  W
-    if (keys[87] == true) {
+    if (keys[87] == true && obj.w == true) {
         camera.position.z -= speed * Math.cos(camera.rotation.y)
         camera.position.x -= speed * Math.sin(camera.rotation.y)
-        console.log(camera.position.z);
-
+        // console.log(camera.position.z);
     }
     // S 
-    if (keys[83] == true) {
+    if (keys[83] == true && obj.s) {
         camera.position.z -= speed * -Math.cos(camera.rotation.y)
         camera.position.x -= speed * -Math.sin(camera.rotation.y)
     }
     // A
-    if (keys[65] == true) {
+    if (keys[65] == true && obj.a) {
         camera.position.z -= speed * -Math.sin(camera.rotation.y)
         camera.position.x -= speed * Math.cos(camera.rotation.y)
     }
     // D
-    if (keys[68] == true) {
+    if (keys[68] == true && obj.d) {
         camera.position.z -= speed * Math.sin(camera.rotation.y)
         camera.position.x -= speed * -Math.cos(camera.rotation.y)
     }
@@ -715,46 +714,70 @@ function movePLayer() {
 
 }
 
-// function confirmTransition() {
-//     let speed = 0.5
-//     let obj = {
-//         w: true,
-//         s: true,
-//         a: true,
-//         d: true
-
-//     }
 
 
 
-//     // alert(Math.cos(camera.rotation.y))
+/**
+ * This function predicts what happens if the user presses the "walking" buttons
+ * !objective: define the limits of the player movement 
+ */
+function confirmTransition() {
+    let speed = 0.5
+    let obj = {
+        w: true,
+        s: true,
+        a: true,
+        d: true
+    }
 
 
-//     // let countW = camera.position.z - 0.5 * Math.cos(camera.rotation.y)
-
-//     // alert(countW)
-
-
-
-//     // if (countW <= 45) {
-
-//     //     obj.w == false
-//     // }
-
-//     if (camera.position.z -= speed * -Math.cos(camera.rotation.y) <= 45) {
-//         obj.s == false
-//     }
-//     if (camera.position.z -= speed * -Math.sin(camera.rotation.y) <= 45) {
-//         obj.a == false
-//     }
-//     if (camera.position.z -= speed * Math.sin(camera.rotation.y) <= 45) {
-//         obj.d == false
-//     }
+    let countWx = camera.position.x - speed * Math.sin(camera.rotation.y)
+    let countSx = camera.position.x - speed * -Math.sin(camera.rotation.y)
+    let countAx = camera.position.x - speed * Math.cos(camera.rotation.y)
+    let countDx = camera.position.x - speed * -Math.cos(camera.rotation.y)
 
 
-//     return obj
+    let countWz = camera.position.z - speed * Math.cos(camera.rotation.y)
+    let countSz = camera.position.z - speed * -Math.cos(camera.rotation.y)
+    let countAz = camera.position.z - speed * -Math.sin(camera.rotation.y)
+    let countDz = camera.position.z - speed * Math.sin(camera.rotation.y)
 
-// }
+
+
+    if (countWz < 45 || countWz > 100) {
+        obj.w = false
+    }
+
+    if (countSz < 45 || countSz > 100) {
+        obj.s = false
+    }
+    if (countAz < 45 || countAz > 100) {
+        obj.a = false
+    }
+    if (countDz < 45 || countDz > 100) {
+        obj.d = false
+    }
+
+
+
+
+
+
+    if (countWx < -50 || countWx > 50) {
+        obj.w = false
+    }
+
+    if (countSx < -50 || countSx > 50) {
+        obj.s = false
+    }
+    if (countAx < -50 || countAx > 50) {
+        obj.a = false
+    }
+    if (countDx < -50 || countDx > 50) {
+        obj.d = false
+    }
+    return obj
+}
 
 
 
