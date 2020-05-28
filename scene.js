@@ -18,6 +18,10 @@ let house;
 let level = 1
 // level 
 
+//  player speed
+// let playerSpeed = 0.5
+//  player speed
+
 // targets speed 
 let speed = {
     min: 0.01,
@@ -43,11 +47,7 @@ let player = {
     civilianKill: 0,
     points: 0,
     maxLevel: level,
-    pos: {
-        x: 0,
-        y: 5,
-        z: 55
-    }
+    speed: 0.5
 }
 let bulletText = document.createElement('p');
 
@@ -63,6 +63,12 @@ let trees = []
 let timer = null
 let display = 0
 //  timer
+
+
+
+// gameProgress
+let gameInProgress = false
+// gameProgress
 
 
 
@@ -114,7 +120,7 @@ window.onload = function init() {
     //camera
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200);
     // position and point the camera to the center of the scene
-    camera.position.set(0, 5, 55);
+    camera.position.set(0, 2, 55);
     camera.lookAt(scene.position);
 
     let axes = new THREE.AxisHelper(200);
@@ -144,8 +150,6 @@ window.onload = function init() {
 
     createLights();
     createPlane();
-    createObstacles();
-    createCivil()
     createHouse();
     textStyle();
     addScope()
@@ -156,8 +160,7 @@ window.onload = function init() {
     document.addEventListener("keydown", keyPressed);
     document.addEventListener('keyup', keyReleased);
 
-
-    startTimer()
+    // startTimer()
     animate();
 }
 
@@ -191,24 +194,36 @@ function toXYCoords(pos) {
 //+ -------------------- ESSENTIAL FUNCTIONS
 
 function onMouseClick(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    intersects = raycaster.intersectObjects(scene.children, true);
-    player.shot -= 1
+    if (gameInProgress == true) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        intersects = raycaster.intersectObjects(scene.children, true);
+        player.shot -= 1
+    }
+
 }
 
 function onMouseMove(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    scope.position.x = mouse.x * 45
-    scope.position.y = mouse.y * 23
-    scope.position.z = 
+    if (gameInProgress == true) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-
+
+        scope.position.x = mouse.x * 45
+        scope.position.y = mouse.y * 23
+
+
+        camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
+
+    }
+
+    // scope.position.z = 
+
+
 
 
 }
@@ -219,15 +234,20 @@ function onMouseMove(event) {
 
 
 function animate() {
-    headShot();
-    ballMove();
-    levelUp();
+    if (gameInProgress) {
+        headShot();
+        ballMove();
+        levelUp();
+
+        textScore.innerHTML = `Score: ${score}`;
+        bulletText.innerHTML = `Bullets: ${player.shot}`;
+
+    }
     movePLayer()
-    textScore.innerHTML = `Score: ${score}`;
-    bulletText.innerHTML = `Bullets: ${player.shot}`;
+
 
     renderer.render(scene, camera)
-    console.log(camera.rotation.y);
+
 
     if (stopLoop == false) {
         requestAnimationFrame(animate)
@@ -236,10 +256,7 @@ function animate() {
 }
 
 function headShot() {
-
-
     countTarget()
-
     if (intersects != null) {
 
         obstacleConfirm()
@@ -334,13 +351,15 @@ function updateSensitivity(e) {
 let mountains = []
 
 function createPlane() {
+
+    //  new THREE.PlaneGeometry(300, 300, 10, 10),
     plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(300, 300, 10, 10),
+        new THREE.BoxGeometry(300, 2, 300),
         new THREE.MeshBasicMaterial({
             color: 0x9b7653,
             side: THREE.DoubleSide
         }));
-    plane.rotateX(Math.PI / 2)
+    plane.position.y = -2
     scene.add(plane);
 }
 
@@ -678,8 +697,6 @@ function levelTimer() {
 }
 
 
-
-
 /**
  * Function related to the press of the keys
  */
@@ -697,48 +714,55 @@ function keyReleased() {
 
 
 function movePLayer() {
-    // * <Car related
-    let speed = 0.5
-    let obj = confirmTransition()
 
 
 
 
+    if (gameInProgress == false) {
+        let obj = confirmTransition()
 
-    //  W
-    if (keys[87] == true && obj.w == true) {
-        camera.position.z -= speed * Math.cos(camera.rotation.y)
-        camera.position.x -= speed * Math.sin(camera.rotation.y)
-        scope.position.z -= speed * Math.cos(camera.rotation.y)
-        // console.log(camera.position.z);
+
+        //  W
+        if (keys[87] == true && obj.w == true) {
+            camera.position.z -= player.speed * Math.cos(camera.rotation.y)
+            camera.position.x -= player.speed * Math.sin(camera.rotation.y)
+            scope.position.z -= player.speed * Math.cos(camera.rotation.y)
+            // console.log(camera.position.z);
+        }
+        // S 
+        if (keys[83] == true && obj.s) {
+            camera.position.z -= player.speed * -Math.cos(camera.rotation.y)
+            camera.position.x -= player.speed * -Math.sin(camera.rotation.y)
+            scope.position.z -= player.speed * -Math.cos(camera.rotation.y)
+        }
+        // A
+        if (keys[65] == true && obj.a) {
+            camera.position.z -= player.speed * -Math.sin(camera.rotation.y)
+            camera.position.x -= player.speed * Math.cos(camera.rotation.y)
+        }
+        // D
+        if (keys[68] == true && obj.d) {
+            camera.position.z -= player.speed * Math.sin(camera.rotation.y)
+            camera.position.x -= player.speed * -Math.cos(camera.rotation.y)
+        }
+
+
+        //   left
+        if (keys[81] == true) {
+            camera.rotation.y += Math.PI * 0.01
+        }
+
+        //   right
+        if (keys[69] == true) {
+            camera.rotation.y -= Math.PI * 0.01
+        }
     }
-    // S 
-    if (keys[83] == true && obj.s) {
-        camera.position.z -= speed * -Math.cos(camera.rotation.y)
-        camera.position.x -= speed * -Math.sin(camera.rotation.y)
-        scope.position.z -= speed * -Math.cos(camera.rotation.y)
-    }
-    // A
-    if (keys[65] == true && obj.a) {
-        camera.position.z -= speed * -Math.sin(camera.rotation.y)
-        camera.position.x -= speed * Math.cos(camera.rotation.y)
-    }
-    // D
-    if (keys[68] == true && obj.d) {
-        camera.position.z -= speed * Math.sin(camera.rotation.y)
-        camera.position.x -= speed * -Math.cos(camera.rotation.y)
-    }
 
-
-    //   left
-    if (keys[81] == true) {
-        camera.rotation.y += Math.PI * 0.01
-    }
-
-
-    //   right
-    if (keys[69] == true) {
-        camera.rotation.y -= Math.PI * 0.01
+    // it is need to press the z to place the "bipod" to start the game
+    if (keys[90] == true && gameInProgress == false) {
+        gameInProgress = true
+        createObstacles();
+        createCivil()
     }
 
 }
@@ -751,7 +775,7 @@ function movePLayer() {
  * !objective: define the limits of the player movement 
  */
 function confirmTransition() {
-    let speed = 0.5
+
     let obj = {
         w: true,
         s: true,
@@ -760,16 +784,16 @@ function confirmTransition() {
     }
 
 
-    let countWx = camera.position.x - speed * Math.sin(camera.rotation.y)
-    let countSx = camera.position.x - speed * -Math.sin(camera.rotation.y)
-    let countAx = camera.position.x - speed * Math.cos(camera.rotation.y)
-    let countDx = camera.position.x - speed * -Math.cos(camera.rotation.y)
+    let countWx = camera.position.x - player.speed * Math.sin(camera.rotation.y)
+    let countSx = camera.position.x - player.speed * -Math.sin(camera.rotation.y)
+    let countAx = camera.position.x - player.speed * Math.cos(camera.rotation.y)
+    let countDx = camera.position.x - player.speed * -Math.cos(camera.rotation.y)
 
 
-    let countWz = camera.position.z - speed * Math.cos(camera.rotation.y)
-    let countSz = camera.position.z - speed * -Math.cos(camera.rotation.y)
-    let countAz = camera.position.z - speed * -Math.sin(camera.rotation.y)
-    let countDz = camera.position.z - speed * Math.sin(camera.rotation.y)
+    let countWz = camera.position.z - player.speed * Math.cos(camera.rotation.y)
+    let countSz = camera.position.z - player.speed * -Math.cos(camera.rotation.y)
+    let countAz = camera.position.z - player.speed * -Math.sin(camera.rotation.y)
+    let countDz = camera.position.z - player.speed * Math.sin(camera.rotation.y)
 
 
 
@@ -786,9 +810,6 @@ function confirmTransition() {
     if (countDz < 45 || countDz > 100) {
         obj.d = false
     }
-
-
-
 
 
 
@@ -809,13 +830,6 @@ function confirmTransition() {
 }
 
 
-
-
-
-
-
-
-
 // ! <testes
 function addScope() {
     let targetGeometry = new THREE.CircleGeometry(1, 32);
@@ -824,6 +838,7 @@ function addScope() {
     });
     scope = new THREE.Mesh(targetGeometry, targetMaterial);
     scope.name = `scope`
+    scope.visible = false
     scene.add(scope);
 }
 
