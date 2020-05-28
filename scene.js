@@ -213,7 +213,7 @@ function onMouseMove(event) {
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-
 
-        scope.position.x = mouse.x * 45
+        scope.position.x = mouse.x * 40
         scope.position.y = mouse.y * 23
 
 
@@ -228,8 +228,13 @@ function onMouseMove(event) {
 function animate() {
     if (gameInProgress) {
         headShot();
+        detectCollision()
         ballMove();
         levelUp();
+
+        console.log(trees[0]);
+
+
 
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
@@ -316,6 +321,11 @@ function ballMove() {
         if (target.obj.position.x >= 20 || target.obj.position.x <= -20) {
             target.vel = -target.vel
         }
+
+
+        if (target.objType == "hostile") {
+            target.obj.position.z += target.velZ
+        }
         target.obj.position.x += target.vel;
     }
 }
@@ -346,12 +356,12 @@ function createPlane() {
 
     //  new THREE.PlaneGeometry(300, 300, 10, 10),
     plane = new THREE.Mesh(
-        new THREE.BoxGeometry(300, 2, 300),
+        new THREE.BoxGeometry(300, 10, 300),
         new THREE.MeshBasicMaterial({
             color: 0x9b7653,
             side: THREE.DoubleSide
         }));
-    plane.position.y = -2
+    plane.position.y = -5
     scene.add(plane);
 }
 
@@ -381,6 +391,8 @@ function createObstacles() {
             obj: head,
             vel: (Math.random() * (speed.max - speed.min) + speed.min) * dir,
             objType: "hostile",
+            velZ: 0.1,
+            collision: false
         })
     }
 
@@ -409,7 +421,7 @@ function createCivil() {
             obj: civil,
             vel: 0.02 * dir,
             objType: "civil",
-            // dead: false
+
         })
     }
 
@@ -463,6 +475,7 @@ function createTree(i) {
 
 
     scene.add(tree)
+    trees.push(tree)
 
 
 }
@@ -751,10 +764,11 @@ function movePLayer() {
     }
 
     // it is need to press the z to place the "bipod" to start the game
-    if (keys[90] == true && gameInProgress == false) {
+    if (keys[32] == true && gameInProgress == false) {
         gameInProgress = true
         createObstacles();
         createCivil()
+        startTimer()
     }
 
 }
@@ -822,7 +836,9 @@ function confirmTransition() {
 }
 
 
-// ! <testes
+/**
+ * Function that adds an "scope" to the system, an scope helps the camera movement
+ */
 function addScope() {
     let targetGeometry = new THREE.CircleGeometry(1, 32);
     let targetMaterial = new THREE.MeshBasicMaterial({
@@ -834,4 +850,63 @@ function addScope() {
     scene.add(scope);
 }
 
-// !testes > 
+
+
+/**
+ * Function that detect the collision between the trees and the "targets"
+ */
+
+function detectCollision() {
+    let collision = false
+
+
+
+    for (const target of targets) {
+        target.collision = false
+    }
+
+
+
+    for (let i = 0; i < targets.length; i++) {
+        collision = false
+        if (targets[i].objType == "hostile") {
+            for (let j = 0; j < trees.length; j++) {
+
+
+                for (const children of trees[j].children) {
+
+                    var BBox = new THREE.Box3().setFromObject(children);
+                    var BBox2 = new THREE.Box3().setFromObject(targets[i].obj);
+                    collision = BBox.intersectsBox(BBox2)
+
+                    console.log(BBox.intersectsBox(BBox2));
+
+                    if (collision) {
+                        targets[i].collision = true
+                        break;
+                    }
+
+                }
+
+                if (collision) {
+                    break;
+                }
+            }
+        }
+    }
+
+
+    for (const target of targets) {
+        if (target.objType == "hostile") {
+            if (target.collision == true) {
+                target.velZ = 0
+            } else {
+                target.velZ = 0.1
+            }
+
+        }
+    }
+
+
+
+}
