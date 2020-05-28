@@ -222,15 +222,7 @@ function onMouseMove(event) {
     }
 
     // scope.position.z = 
-
-
-
-
 }
-
-
-
-
 
 
 function animate() {
