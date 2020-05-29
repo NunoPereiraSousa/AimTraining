@@ -110,6 +110,20 @@ let score = 0;
 let textScore = document.createElement('p');
 // Score
 
+
+
+//bunker parts
+let compBunker = new THREE.Object3D();
+let bunker = {
+    bWall: null,
+    lWall: null,
+    roof: null,
+    bfWall: null
+
+}
+
+// 
+
 window.addEventListener("mousedown", bonusScore, false);
 window.addEventListener("resize", responsiveScene);
 
@@ -150,6 +164,7 @@ window.onload = function init() {
 
     createLights();
     createPlane();
+    createBunker()
     createHouse();
     textStyle();
     addScope()
@@ -819,17 +834,17 @@ function confirmTransition() {
 
 
 
-    if (countWx < -50 || countWx > 50) {
+    if (countWx < -25 || countWx > 25) {
         obj.w = false
     }
 
-    if (countSx < -50 || countSx > 50) {
+    if (countSx < -25 || countSx > 25) {
         obj.s = false
     }
-    if (countAx < -50 || countAx > 50) {
+    if (countAx < -25 || countAx > 25) {
         obj.a = false
     }
-    if (countDx < -50 || countDx > 50) {
+    if (countDx < -25 || countDx > 25) {
         obj.d = false
     }
     return obj
@@ -908,5 +923,62 @@ function detectCollision() {
     }
 
 
+
+}
+
+
+/**
+ * Function that creates the "bunker" that the player is 
+ */
+function createBunker() {
+    let bWidth = 80
+    let height = 8
+
+    let wallsDeep = 2
+
+    compBunker = new THREE.Object3D();
+
+    // back wall
+    let geometry = new THREE.BoxGeometry(bWidth, height, wallsDeep);
+    let material = new THREE.MeshBasicMaterial({
+        color: "red"
+    });
+    bunker.bWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.bWall)
+
+
+    //  left wall
+    geometry = new THREE.BoxGeometry(wallsDeep, height, 40);
+    bunker.lWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.lWall)
+    bunker.lWall.position.x = -bWidth / 2
+    bunker.lWall.position.z = -19
+
+
+    // right wall
+    bunker.rWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.rWall)
+    bunker.rWall.position.x = bWidth / 2
+    bunker.rWall.position.z = -19
+
+    // front bottom 
+    geometry = new THREE.BoxGeometry(bWidth, height / 8, wallsDeep);
+    bunker.bfWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.bfWall)
+    bunker.bfWall.position.z = -38
+    bunker.bfWall.position.y = -height + 4.5
+
+    //  roof
+    geometry = new THREE.BoxGeometry(bWidth, 4 / 3, 40);
+    bunker.roof = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.roof)
+    bunker.roof.position.z = -20
+    bunker.roof.position.y = 6 - 1.5
+
+    //  bunker place
+    compBunker.position.y = height / 2
+    scene.add(compBunker)
+
+    compBunker.position.z = 55 + 20
 
 }
