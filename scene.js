@@ -18,6 +18,7 @@ let house;
 let level = 1
 // level 
 
+
 //  player speed
 // let playerSpeed = 0.5
 //  player speed
@@ -25,7 +26,7 @@ let level = 1
 // targets speed 
 let speed = {
     min: 0.01,
-    max: 0.02,
+    max: 0.05,
 }
 // targets speed
 
@@ -47,7 +48,8 @@ let player = {
     civilianKill: 0,
     points: 0,
     maxLevel: level,
-    speed: 0.5
+    speed: 0.5,
+    live: 5
 }
 let bulletText = document.createElement('p');
 
@@ -134,7 +136,7 @@ window.onload = function init() {
     //camera
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200);
     // position and point the camera to the center of the scene
-    camera.position.set(0, 2, 55);
+    camera.position.set(0, 1.2, 55);
     camera.lookAt(scene.position);
 
     let axes = new THREE.AxisHelper(200);
@@ -244,19 +246,27 @@ function animate() {
     if (gameInProgress) {
         headShot();
         detectCollision()
-        ballMove();
+        targetsMove();
         levelUp();
 
-        console.log(trees[0]);
+        terroristBoom()
+
+
+
+
+
+
+
 
 
 
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
+        createBunker()
 
     }
     movePLayer()
-
+    // console.log(camera.position.z);
 
     renderer.render(scene, camera)
 
@@ -331,9 +341,9 @@ document.addEventListener("mousemove", onMouseMove, false);
 
 let ballVel = 0.01;
 
-function ballMove() {
+function targetsMove() {
     for (const target of targets) {
-        if (target.obj.position.x >= 20 || target.obj.position.x <= -20) {
+        if (target.obj.position.x >= 50 || target.obj.position.x <= -50) {
             target.vel = -target.vel
         }
 
@@ -385,6 +395,7 @@ function createLights() {
     scene.add(light)
 }
 
+// new THREE.
 
 // Todo <
 /**
@@ -394,19 +405,19 @@ function createObstacles() {
     for (let i = 0; i < 2 * level; i++) {
         let dir = Math.random() * (1 - (-1)) + -1, //!directions
             head = new THREE.Mesh(
-                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.BoxGeometry(2, 3, 0.5),
                 new THREE.MeshBasicMaterial({
                     color: 0xffff00
                 }));
         head.name = `head${i + 1}`
-        positionX = Math.floor(Math.random() * (40)) - 20;
-        positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
-        head.position.set(positionX, 3, positionZ);
+        positionX = Math.floor(Math.random() * (50 - (-50) + 1) - 50);
+        positionZ = Math.floor(Math.random() * (-50 - (-60) + 1) - 60);
+        head.position.set(positionX, 1.5, positionZ);
         targets.push({
             obj: head,
             vel: (Math.random() * (speed.max - speed.min) + speed.min) * dir,
             objType: "hostile",
-            velZ: 0.1,
+            velZ: 0.5,
             collision: false
         })
     }
@@ -421,17 +432,17 @@ function createObstacles() {
  */
 function createCivil() {
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 2 * level / 2; i++) {
         let dir = Math.random() * (1 - (-1)) + -1,
             civil = new THREE.Mesh(
-                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.BoxGeometry(2, 3, 0.5),
                 new THREE.MeshBasicMaterial({
                     color: "blue"
                 }));
         civil.name = `civil${i + 1}`
         positionX = Math.floor(Math.random() * (40)) - 20;
         positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
-        civil.position.set(positionX, 3, positionZ);
+        civil.position.set(positionX, 1.5, positionZ);
         targets.push({
             obj: civil,
             vel: 0.02 * dir,
@@ -743,11 +754,11 @@ function movePLayer() {
 
 
         //  W
-        if (keys[87] == true && obj.w == true) {
+        if (keys[87] == true && obj.w) {
             camera.position.z -= player.speed * Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * Math.cos(camera.rotation.y)
-            // console.log(camera.position.z);
+
         }
         // S 
         if (keys[83] == true && obj.s) {
@@ -818,26 +829,23 @@ function confirmTransition() {
 
 
 
-    if (countWz < 45 || countWz > 100) {
+    if (countWz < 51 || countWz > 60) {
         obj.w = false
     }
 
-    if (countSz < 45 || countSz > 100) {
+    if (countSz < 51 || countSz > 60) {
         obj.s = false
     }
-    if (countAz < 45 || countAz > 100) {
+    if (countAz < 51 || countAz > 60) {
         obj.a = false
     }
-    if (countDz < 45 || countDz > 100) {
+    if (countDz < 51 || countDz > 60) {
         obj.d = false
     }
-
-
 
     if (countWx < -25 || countWx > 25) {
         obj.w = false
     }
-
     if (countSx < -25 || countSx > 25) {
         obj.s = false
     }
@@ -881,7 +889,6 @@ function detectCollision() {
     }
 
 
-
     for (let i = 0; i < targets.length; i++) {
         collision = false
         if (targets[i].objType == "hostile") {
@@ -894,7 +901,7 @@ function detectCollision() {
                     var BBox2 = new THREE.Box3().setFromObject(targets[i].obj);
                     collision = BBox.intersectsBox(BBox2)
 
-                    console.log(BBox.intersectsBox(BBox2));
+
 
                     if (collision) {
                         targets[i].collision = true
@@ -914,6 +921,12 @@ function detectCollision() {
     for (const target of targets) {
         if (target.objType == "hostile") {
             if (target.collision == true) {
+
+                if (target.vel > 0) {
+                    target.obj.position.x += 0.05
+                } else {
+                    target.obj.position.x -= 0.05
+                }
                 target.velZ = 0
             } else {
                 target.velZ = 0.1
@@ -932,10 +945,8 @@ function detectCollision() {
  */
 function createBunker() {
     let bWidth = 80
-    let height = 8
-
+    let height = 2 // 8 
     let wallsDeep = 2
-
     compBunker = new THREE.Object3D();
 
     // back wall
@@ -962,18 +973,18 @@ function createBunker() {
     bunker.rWall.position.z = -19
 
     // front bottom 
-    geometry = new THREE.BoxGeometry(bWidth, height / 8, wallsDeep);
+    geometry = new THREE.BoxGeometry(bWidth, 4 / 8, wallsDeep);
     bunker.bfWall = new THREE.Mesh(geometry, material);
     compBunker.add(bunker.bfWall)
     bunker.bfWall.position.z = -38
-    bunker.bfWall.position.y = -height + 4.5
+    bunker.bfWall.position.y = -0.8
 
     //  roof
-    geometry = new THREE.BoxGeometry(bWidth, 4 / 3, 40);
-    bunker.roof = new THREE.Mesh(geometry, material);
-    compBunker.add(bunker.roof)
-    bunker.roof.position.z = -20
-    bunker.roof.position.y = 6 - 1.5
+    // geometry = new THREE.BoxGeometry(bWidth, 4 / 3, 40);
+    // bunker.roof = new THREE.Mesh(geometry, material);
+    // compBunker.add(bunker.roof)
+    // bunker.roof.position.z = -20
+    // bunker.roof.position.y = 6 - 1.5
 
     //  bunker place
     compBunker.position.y = height / 2
@@ -981,4 +992,24 @@ function createBunker() {
 
     compBunker.position.z = 55 + 20
 
+}
+
+
+
+
+
+function terroristBoom() {
+    let removes = []
+    for (const target of targets) {
+        if (target.objType == "hostile" && (target.obj.position.z >= 50)) {
+            scene.remove(target.obj);
+            removes.push(target.obj.name) // id of the target
+            player.live -= 1
+            console.log(`boom: ${player.live} `);
+
+        }
+    }
+    for (const id of removes) {
+        targets = targets.filter(target => target.obj.name != id);
+    }
 }
