@@ -126,15 +126,22 @@ let bunker = {
 
 // 
 
+
+
+//  !test variables: 
+let gun = null
+// ! test variables 
+
 window.addEventListener("mousedown", bonusScore, false);
 window.addEventListener("resize", responsiveScene);
 
 window.onload = function init() {
+
     //scene
     scene = new THREE.Scene();
 
     //camera
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
     // position and point the camera to the center of the scene
     camera.position.set(0, 1.2, 55);
     camera.lookAt(scene.position);
@@ -176,8 +183,16 @@ window.onload = function init() {
 
     document.addEventListener("keydown", keyPressed);
     document.addEventListener('keyup', keyReleased);
-
+    loadGun()
     // startTimer()
+    // flechasObject.traverse(function (object) {
+    //     object.frustumCulled = false;
+    // });
+
+
+    // scene.traverse((node) => {
+    //     if (node.isMesh) node.material.transparent = false;
+    // });
     animate();
 }
 
@@ -260,6 +275,7 @@ function animate() {
 
 
 
+
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
         createBunker()
@@ -269,6 +285,9 @@ function animate() {
     // console.log(camera.position.z);
 
     renderer.render(scene, camera)
+    // $('selector').css({
+    //     'cursor': 'url(/Images/scope/redDoteScope.jpg), auto'
+    // });
 
 
     if (stopLoop == false) {
@@ -755,37 +774,62 @@ function movePLayer() {
 
         //  W
         if (keys[87] == true && obj.w) {
+            // camera an scope positioning
             camera.position.z -= player.speed * Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * Math.cos(camera.rotation.y)
+            // gun positioning
+            gun.position.z -= player.speed * Math.cos(camera.rotation.y)
+            gun.position.x -= player.speed * Math.sin(camera.rotation.y)
+            gun.position.y = 3.5
 
         }
         // S 
         if (keys[83] == true && obj.s) {
+            // camera and scope
             camera.position.z -= player.speed * -Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * -Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * -Math.cos(camera.rotation.y)
+            // gun positioning 
+            gun.position.z -= player.speed * -Math.cos(camera.rotation.y)
+            gun.position.x -= player.speed * -Math.sin(camera.rotation.y)
+            gun.position.y = 3.5
         }
         // A
         if (keys[65] == true && obj.a) {
+            //  camera and scope positioning
             camera.position.z -= player.speed * -Math.sin(camera.rotation.y)
             camera.position.x -= player.speed * Math.cos(camera.rotation.y)
+
+            //  gun positioning
+            gun.position.z -= player.speed * -Math.sin(camera.rotation.y)
+            gun.position.x -= player.speed * Math.cos(camera.rotation.y)
         }
         // D
         if (keys[68] == true && obj.d) {
+
+            //  camera and scope positioning
             camera.position.z -= player.speed * Math.sin(camera.rotation.y)
             camera.position.x -= player.speed * -Math.cos(camera.rotation.y)
+            // gun positioning
+            gun.position.z -= player.speed * Math.sin(camera.rotation.y)
+            gun.position.x -= player.speed * -Math.cos(camera.rotation.y)
+
+
+
         }
 
 
         //   left
         if (keys[81] == true) {
             camera.rotation.y += Math.PI * 0.01
+            gun.rotation.y += Math.PI * 0.002
         }
 
         //   right
         if (keys[69] == true) {
             camera.rotation.y -= Math.PI * 0.01
+            gun.rotation.y -= Math.PI * 0.002
         }
     }
 
@@ -951,7 +995,7 @@ function createBunker() {
 
     // back wall
     let geometry = new THREE.BoxGeometry(bWidth, height, wallsDeep);
-    let material = new THREE.MeshBasicMaterial({
+    let material = new THREE.MeshPhongMaterial({
         color: "red"
     });
     bunker.bWall = new THREE.Mesh(geometry, material);
@@ -997,7 +1041,7 @@ function createBunker() {
 
 
 
-
+//  Todo : This is unfinished I need to finish this boommmmm
 function terroristBoom() {
     let removes = []
     for (const target of targets) {
@@ -1012,4 +1056,42 @@ function terroristBoom() {
     for (const id of removes) {
         targets = targets.filter(target => target.obj.name != id);
     }
+}
+
+
+
+/**
+ * Function that loads the guns 
+ * 
+ */
+function loadGun() {
+
+    let mtlLoader = new THREE.MTLLoader();
+    mtlLoader.load('/models/M4A1/M4A1.mtl', function (materials) {
+        materials.preload();
+        let loader = new THREE.OBJLoader();
+        loader.setMaterials(materials);
+        loader.load('/models/M4A1/M4A1.obj', function (object) {
+            gun = object;
+            gun.scale.set(0.3, 0.3, 0.3);
+
+
+            gun.position.z = 45
+            gun.position.y = 3.5
+
+            gun.frustumCulled = false;
+            scene.add(gun);
+        });
+    });
+}
+
+
+
+function positionGun() {
+
+
+
+
+
+
 }

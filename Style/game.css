@@ -141,6 +141,11 @@ body {
           animation-delay: 0.5s;
 }
 
+
+/* window{
+  cursor: url('/Images/scope/redDoteScope.jpg'), auto;	
+} */
+
 @-webkit-keyframes fadeInRight {
   0% {
     opacity: 0;
