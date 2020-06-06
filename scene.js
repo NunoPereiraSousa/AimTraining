@@ -255,12 +255,16 @@ function toXYCoords(pos) {
 let mountains = []
 
 function createPlane() {
-
+    let planeTexture = new THREE.TextureLoader().load("/Images/terrain.jpg");
     //  new THREE.PlaneGeometry(300, 300, 10, 10),
+    planeTexture.wrapS = THREE.RepeatWrapping;
+    planeTexture.wrapT = THREE.RepeatWrapping;
+    planeTexture.repeat.set(200, 100);
     plane = new THREE.Mesh(
         new THREE.BoxGeometry(300, 10, 300),
         new THREE.MeshBasicMaterial({
-            color: 0x9b7653,
+            // map: planeTexture,
+            color: 0xDEB887,
             side: THREE.DoubleSide
         }));
     plane.position.y = -5
@@ -337,15 +341,29 @@ function createCivil() {
 function createTree(i) {
     tree = new THREE.Object3D();
 
+    let trunkTexture = new THREE.TextureLoader().load("/Images/trunk.jpg");
+    trunkTexture.wrapS = THREE.RepeatWrapping;
+    trunkTexture.wrapT = THREE.RepeatWrapping;
+    trunkTexture.repeat.set(4, 4);
+
     let trunk = new THREE.Mesh(
         new THREE.CylinderGeometry(0.1, 0.05, 2),
-        material[0]);
+        new THREE.MeshLambertMaterial({
+            // map: trunkTexture
+            color: randomGreenColor()
+        }));
     trunk.position.y = 1;
     tree.add(trunk);
+
+    let treeTexture = new THREE.TextureLoader().load("/Images/treeGreen2.jpg");
+    treeTexture.wrapS = THREE.RepeatWrapping;
+    treeTexture.wrapT = THREE.RepeatWrapping;
+    treeTexture.repeat.set(2, 4);
 
     let bottom = new THREE.Mesh(
         new THREE.CylinderGeometry(0, 0.45, 2, 16),
         new THREE.MeshLambertMaterial({
+            // map: treeTexture
             color: randomGreenColor()
         }));
     bottom.position.y = 1.8;
@@ -355,6 +373,7 @@ function createTree(i) {
         new THREE.CylinderGeometry(0, 0.39, 3),
         new THREE.MeshLambertMaterial({
             color: randomGreenColor()
+            // map: treeTexture
         }));
     middle.position.y = 3.2;
     tree.add(middle);
@@ -363,6 +382,7 @@ function createTree(i) {
         new THREE.CylinderGeometry(0, 0.32, 3),
         new THREE.MeshLambertMaterial({
             color: randomGreenColor()
+            // map: treeTexture
         }));
     top.position.y = 4.3;
     tree.add(top);
@@ -413,14 +433,19 @@ function createBunker() {
     let wallsDeep = 2
     compBunker = new THREE.Object3D();
 
+    let wallTexture = new THREE.TextureLoader().load("/Images/wall.jpg");
+    wallTexture.wrapS = THREE.RepeatWrapping;
+    wallTexture.wrapT = THREE.RepeatWrapping;
+    wallTexture.repeat.set(50, 1);
+
     // back wall
     let geometry = new THREE.BoxGeometry(bWidth, height, wallsDeep);
     let material = new THREE.MeshPhongMaterial({
-        color: "red"
+        // map: wallTexture
+        color: 0x888888
     });
     bunker.bWall = new THREE.Mesh(geometry, material);
     compBunker.add(bunker.bWall)
-
 
     //  left wall
     geometry = new THREE.BoxGeometry(wallsDeep, height, 40);
@@ -428,7 +453,6 @@ function createBunker() {
     compBunker.add(bunker.lWall)
     bunker.lWall.position.x = -bWidth / 2
     bunker.lWall.position.z = -19
-
 
     // right wall
     bunker.rWall = new THREE.Mesh(geometry, material);

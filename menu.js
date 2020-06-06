@@ -133,12 +133,12 @@ function addLight(h, s, l, x, y, z) {
 
     let textureFlare0 = textureLoader.load('/Images/lensflare0.png');
     let textureFlare3 = textureLoader.load('/Images/lensflare3.png');
-    var light = new THREE.PointLight(0xffffff, 1.5, 2000);
+    let light = new THREE.PointLight(0xffffff, 1.5, 2000);
     light.color.setHSL(h, s, l);
     light.position.set(x, y, z);
     scene.add(light);
 
-    var lensflare = new Lensflare();
+    let lensflare = new Lensflare();
     lensflare.addElement(new LensflareElement(textureFlare0, 700, 0, light.color));
     lensflare.addElement(new LensflareElement(textureFlare3, 60, 0.6));
     lensflare.addElement(new LensflareElement(textureFlare3, 70, 0.7));
