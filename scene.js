@@ -12,6 +12,7 @@ let targets = [];
 let civil;
 let civilians = []
 let house;
+let sky;
 // objects
 
 // level
@@ -143,7 +144,6 @@ window.addEventListener("mousedown", bonusScore, false);
 window.addEventListener("resize", responsiveScene);
 
 window.onload = function init() {
-
     //scene
     scene = new THREE.Scene();
 
@@ -161,16 +161,9 @@ window.onload = function init() {
         antialias: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor("#971414", 5);
+    // renderer.setClearColor("#ffffff", 50);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    //! NOT USE CONTROLS IN THIS PROJECT !!!!
-
-    // controls = new THREE.OrbitControls(camera);
-    // controls.addEventListener('change', function () {
-    //     renderer.render(scene, camera);
-    // });
 
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
@@ -182,9 +175,10 @@ window.onload = function init() {
     createPlane();
     createBunker()
     createHouse();
+    createSky();
     textStyle();
-    addScope()
-    addScopeMirror()
+    addScope();
+    addScopeMirror();
 
     display = 30
 
@@ -202,6 +196,31 @@ window.onload = function init() {
     //     if (node.isMesh) node.material.transparent = false;
     // });
     animate();
+}
+
+function animate() {
+    if (gameInProgress) {
+        headShot();
+        detectCollision()
+        targetsMove();
+        levelUp();
+
+        terroristBoom()
+
+        sky.rotation.y += 0.0002;
+
+        textScore.innerHTML = `Score: ${score}`;
+        bulletText.innerHTML = `Bullets: ${player.shot}`;
+        createBunker()
+
+    }
+    movePLayer()
+
+    if (stopLoop == false) {
+        requestAnimationFrame(animate)
+    }
+
+    renderer.render(scene, camera)
 }
 
 function textStyle() {
@@ -231,183 +250,8 @@ function toXYCoords(pos) {
     return vector;
 }
 
-//+ -------------------- ESSENTIAL FUNCTIONS
-
-function onMouseClick(event) {
-    if (gameInProgress == true) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        intersects = raycaster.intersectObjects(scene.children, true);
-        player.shot -= 1
-    }
-
-}
-
-function onMouseMove(event) {
-
-
-    if (gameInProgress == true) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-
-
-        scope.position.x = mouse.x * 40
-        scope.position.y = mouse.y * 23
-
-
-        scopeMirror.position.x = mouse.x * 150
-        scopeMirror.position.y = mouse.y * 50
-
-
-        camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        gun.lookAt(-scopeMirror.position.x, -scopeMirror.position.y, scopeMirror.position.z)
-
-    }
-
-    // scope.position.z = 
-}
-
-
-function animate() {
-    if (gameInProgress) {
-        headShot();
-        detectCollision()
-        targetsMove();
-        levelUp();
-
-        terroristBoom()
-
-
-
-
-
-
-
-
-
-
-
-        textScore.innerHTML = `Score: ${score}`;
-        bulletText.innerHTML = `Bullets: ${player.shot}`;
-        createBunker()
-
-    }
-    movePLayer()
-
-
-    renderer.render(scene, camera)
-    // $('selector').css({
-    //     'cursor': 'url(/Images/scope/redDoteScope.jpg), auto'
-    // });
-
-
-    if (stopLoop == false) {
-        requestAnimationFrame(animate)
-    }
-
-}
-
-function headShot() {
-    countTarget()
-    if (intersects != null) {
-
-        obstacleConfirm()
-        humanShieldConfirm()
-        intersects.forEach(intersection => {
-            targets.forEach((target, i) => {
-
-                if (intersection.object.name === target.obj.name) {
-                    scene.remove(intersection.object);
-                    if (target.objType == "civil") {
-                        display -= (3 + level)
-                        player.civilianKill++
-                        if (score > 1) {
-                            score -= 2;
-                        } else if (score == 1) {
-                            score = 0
-                        }
-                    } else if (target.objType == "hostile") {
-                        player.kill++
-                        score += 1;
-                    }
-                    target.dead = true
-                    targets.splice(i, 1); // Remove de deaths
-                }
-            });
-        })
-    }
-
-    intersects = null
-}
-
-
-
-function countTarget() {
-    civilCount = 0
-    ballCount = 0
-    for (const target of targets) {
-        if (target.objType == "civil") {
-            civilCount++
-        } else {
-            ballCount++
-        }
-    }
-    // civilCount -= (1 * level)
-    // ballCount -= (1 * level)
-
-}
-// Todo 
-function bonusScore(event) {
-    countTarget()
-
-
-
-    if (event.timeStamp < 3000 * level && ballCount - 1 === 0) {
-        score += 10
-    }
-}
-document.body.addEventListener("mousedown", onMouseClick);
-document.addEventListener("mousemove", onMouseMove, false);
-
-// let ballVel = 0.01;
-
-function targetsMove() {
-    for (const target of targets) {
-        if (target.obj.position.x >= 80 || target.obj.position.x <= -80) {
-            target.vel = -target.vel
-        }
-
-
-        if (target.objType == "hostile") {
-            target.obj.position.z += target.velZ
-        }
-        target.obj.position.x += target.vel;
-    }
-}
-
-var lastmousex = -1;
-var lastmousey = -1;
-var lastmousetime;
-var mousetravel = 0;
-window.addEventListener("mousemove", updateSensitivity)
-
-function updateSensitivity(e) {
-    var mousex = e.pageX;
-    var mousey = e.pageY;
-    if (lastmousex > -1)
-        mousetravel += Math.max(Math.abs(mousex - lastmousex), Math.abs(mousey - lastmousey));
-    lastmousex = mousex;
-    lastmousey = mousey;
-    return
-    // plane.position.x = targetX;
-}
-
-//+ -------------------- ESSENTIAL FUNCTIONS
-
 //? -------------------- CREATING/ MODELING OBJECTS
+
 let mountains = []
 
 function createPlane() {
@@ -428,12 +272,16 @@ function createLights() {
     scene.add(light)
 }
 
-// new THREE.
+function createSky() {
+    sky = new THREE.Mesh(
+        new THREE.SphereGeometry(145, 64, 64),
+        new THREE.MeshPhongMaterial({
+            map: new THREE.TextureLoader().load("/Images/sky.jpg")
+        }));
+    sky.material.side = THREE.DoubleSide;
+    scene.add(sky);
+}
 
-// Todo --Functions related to "people" spawn--<
-/**
- * *Create hostiles
- */
 function createObstacles() {
     for (let i = 0; i < 2 * level; i++) {
         let dir = Math.random() * (1 - (-1)) + -1, //!directions
@@ -460,9 +308,6 @@ function createObstacles() {
     }
 }
 
-/**
- * * function that create civilians
- */
 function createCivil() {
 
     for (let i = 0; i < 2 * level / 2; i++) {
@@ -488,7 +333,6 @@ function createCivil() {
         scene.add(civil.obj);
     }
 }
-// Todo --Functions related to "people" spawn-->
 
 function createTree(i) {
     tree = new THREE.Object3D();
@@ -531,12 +375,8 @@ function createTree(i) {
     tree.position.set(positionX, 0, positionZ);
     tree.name = `tree`
 
-
-
     scene.add(tree)
     trees.push(tree)
-
-
 }
 
 function createHouse() {
@@ -565,6 +405,57 @@ function createHouse() {
     cone.rotateY(radians(45))
     cone.position.y = 8;
     house.add(cone);
+}
+
+function createBunker() {
+    let bWidth = 80
+    let height = 2 // 8 
+    let wallsDeep = 2
+    compBunker = new THREE.Object3D();
+
+    // back wall
+    let geometry = new THREE.BoxGeometry(bWidth, height, wallsDeep);
+    let material = new THREE.MeshPhongMaterial({
+        color: "red"
+    });
+    bunker.bWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.bWall)
+
+
+    //  left wall
+    geometry = new THREE.BoxGeometry(wallsDeep, height, 40);
+    bunker.lWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.lWall)
+    bunker.lWall.position.x = -bWidth / 2
+    bunker.lWall.position.z = -19
+
+
+    // right wall
+    bunker.rWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.rWall)
+    bunker.rWall.position.x = bWidth / 2
+    bunker.rWall.position.z = -19
+
+    // front bottom 
+    geometry = new THREE.BoxGeometry(bWidth, 4 / 8, wallsDeep);
+    bunker.bfWall = new THREE.Mesh(geometry, material);
+    compBunker.add(bunker.bfWall)
+    bunker.bfWall.position.z = -38
+    bunker.bfWall.position.y = -0.8
+
+    //  roof
+    // geometry = new THREE.BoxGeometry(bWidth, 4 / 3, 40);
+    // bunker.roof = new THREE.Mesh(geometry, material);
+    // compBunker.add(bunker.roof)
+    // bunker.roof.position.z = -20
+    // bunker.roof.position.y = 6 - 1.5
+
+    //  bunker place
+    compBunker.position.y = height / 2
+    scene.add(compBunker)
+
+    compBunker.position.z = 55 + 20
+
 }
 
 //? -------------------- CREATING/ MODELING OBJECTS
@@ -601,10 +492,120 @@ function responsiveScene() {
 }
 
 //* -------------------- HELPING FUNCTIONS
+
+//+ -------------------- ESSENTIAL FUNCTIONS
+
+function onMouseClick(event) {
+    if (gameInProgress == true) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        intersects = raycaster.intersectObjects(scene.children, true);
+        player.shot -= 1
+    }
+}
+
+function onMouseMove(event) {
+    if (gameInProgress == true) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        scope.position.x = mouse.x * 40
+        scope.position.y = mouse.y * 23
+
+        scopeMirror.position.x = mouse.x * 150
+        scopeMirror.position.y = mouse.y * 50
+
+        camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
+        gun.lookAt(-scopeMirror.position.x, -scopeMirror.position.y, scopeMirror.position.z)
+    }
+}
+
+function headShot() {
+    countTarget()
+    if (intersects != null) {
+
+        obstacleConfirm()
+        humanShieldConfirm()
+        intersects.forEach(intersection => {
+            targets.forEach((target, i) => {
+
+                if (intersection.object.name === target.obj.name) {
+                    scene.remove(intersection.object);
+                    if (target.objType == "civil") {
+                        display -= (3 + level)
+                        player.civilianKill++
+                        if (score > 1) {
+                            score -= 2;
+                        } else if (score == 1) {
+                            score = 0
+                        }
+                    } else if (target.objType == "hostile") {
+                        player.kill++
+                        score += 1;
+                    }
+                    target.dead = true
+                    targets.splice(i, 1); // Remove de deaths
+                }
+            });
+        })
+    }
+    intersects = null
+}
+
+function countTarget() {
+    civilCount = 0
+    ballCount = 0
+    for (const target of targets) {
+        if (target.objType == "civil") {
+            civilCount++
+        } else {
+            ballCount++
+        }
+    }
+}
+
+function bonusScore(event) {
+    countTarget()
+
+    if (event.timeStamp < 3000 * level && ballCount - 1 === 0) {
+        score += 10
+    }
+}
+document.body.addEventListener("mousedown", onMouseClick);
+document.addEventListener("mousemove", onMouseMove, false);
+
+function targetsMove() {
+    for (const target of targets) {
+        if (target.obj.position.x >= 80 || target.obj.position.x <= -80) {
+            target.vel = -target.vel
+        }
+
+        if (target.objType == "hostile") {
+            target.obj.position.z += target.velZ
+        }
+        target.obj.position.x += target.vel;
+    }
+}
+
+var lastmousex = -1;
+var lastmousey = -1;
+var lastmousetime;
+var mousetravel = 0;
+window.addEventListener("mousemove", updateSensitivity)
+
+function updateSensitivity(e) {
+    var mousex = e.pageX;
+    var mousey = e.pageY;
+    if (lastmousex > -1)
+        mousetravel += Math.max(Math.abs(mousex - lastmousex), Math.abs(mousey - lastmousey));
+    lastmousex = mousex;
+    lastmousey = mousey;
+    return
+    // plane.position.x = targetX;
+}
+
 function levelUp() {
-
-
-
     if (inGame()) {
         if (ballCount == 0) {
 
@@ -632,8 +633,6 @@ function levelUp() {
         stopLoop = true
         stopTimer()
     }
-
-
 }
 
 function removeEntity(object) {
@@ -652,7 +651,6 @@ function playerReload() {
  * Function that confirms if the players continues in the game or not 
  */
 function inGame() {
-
     if (display <= 0) {
         return false
     }
@@ -708,7 +706,6 @@ function obstacleConfirm() {
     intersects = intersects3 // you just need the targets not all the objects that where in the way of the mouse click
 }
 
-
 /**
  * Function that confirms if there is an target in front of another target (human shield) 
  */
@@ -718,14 +715,12 @@ function humanShieldConfirm() {
     for (let i = 0; i < intersects.length; i++) {
         let push = true
         for (let j = 0; j < intersects.length; j++) {
-
             if (intersects[j].object.name !== intersects[i].object.name) {
                 if (intersects[j].object.position.z > intersects[i].object.position.z) {
                     push = false
                     break
                 }
             }
-
         }
         if (push == true) {
             intersects2.push(intersects[i])
@@ -740,7 +735,6 @@ function humanShieldConfirm() {
  * Function that add a timer to the system 
  * if the time in the timer = 0 the player loses 
  */
-
 function startTimer() {
 
     timer = window.setTimeout(
@@ -758,15 +752,12 @@ function stopTimer() {
     startTimer()
 }
 
-
-
 /**
  * Function that alter changes de "Time that the person need to complete an level"
  */
 function levelTimer() {
     display += (20 + level)
 }
-
 
 /**
  * Function related to the press of the keys
@@ -776,22 +767,14 @@ function keyPressed(event) {
     keys[event.keyCode] = true
 }
 
-
 // Key up handling 
 function keyReleased() {
     keys[event.keyCode] = false
 }
 
-
-
 function movePLayer() {
-
-
-
-
     if (gameInProgress == false) {
         let obj = confirmTransition()
-
 
         //  W
         if (keys[87] == true && obj.w) {
@@ -799,17 +782,10 @@ function movePLayer() {
             camera.position.z -= player.speed * Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * Math.cos(camera.rotation.y)
-
-
-
-            // !!!!!!!!!1
             scopeMirror.position.z -= player.speed * Math.cos(camera.rotation.y)
-
-
             // gun positioning
             gun.position.z -= player.speed * Math.cos(camera.rotation.y)
             gun.position.x -= player.speed * Math.sin(camera.rotation.y)
-
         }
         // S 
         if (keys[83] == true && obj.s) {
@@ -817,9 +793,6 @@ function movePLayer() {
             camera.position.z -= player.speed * -Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * -Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * -Math.cos(camera.rotation.y)
-
-
-
             scopeMirror.position.z -= player.speed * -Math.cos(camera.rotation.y)
             // gun positioning 
             gun.position.z -= player.speed * -Math.cos(camera.rotation.y)
@@ -846,7 +819,6 @@ function movePLayer() {
             gun.position.x -= player.speed * -Math.cos(camera.rotation.y)
         }
 
-
         //   left
         if (keys[81] == true) {
             camera.rotation.y += Math.PI * 0.01
@@ -862,9 +834,6 @@ function movePLayer() {
 
     // it is need to press the "SPACE BAR" to place the "bipod" to start the game
     if (keys[32] == true && gameInProgress == false) {
-
-
-
         let time = 0
 
         do {
@@ -878,33 +847,22 @@ function movePLayer() {
             if (time == 30000) {
                 countDown--
             }
-            console.log(time);
-
             time++
-
         } while (countDown != 0);
-
-
 
         countDown = 3
         gameInProgress = true
         createObstacles();
         createCivil()
-
         startTimer()
     }
-
 }
-
-
-
 
 /**
  * This function predicts what happens if the user presses the "walking" buttons
  * !objective: define the limits of the player movement 
  */
 function confirmTransition() {
-
     let obj = {
         w: true,
         s: true,
@@ -912,20 +870,15 @@ function confirmTransition() {
         d: true
     }
 
-
     let countWx = camera.position.x - player.speed * Math.sin(camera.rotation.y)
     let countSx = camera.position.x - player.speed * -Math.sin(camera.rotation.y)
     let countAx = camera.position.x - player.speed * Math.cos(camera.rotation.y)
     let countDx = camera.position.x - player.speed * -Math.cos(camera.rotation.y)
 
-
     let countWz = camera.position.z - player.speed * Math.cos(camera.rotation.y)
     let countSz = camera.position.z - player.speed * -Math.cos(camera.rotation.y)
     let countAz = camera.position.z - player.speed * -Math.sin(camera.rotation.y)
     let countDz = camera.position.z - player.speed * Math.sin(camera.rotation.y)
-
-
-
 
     if (countWz < 41.5 || countWz > 72) {
         obj.w = false
@@ -956,7 +909,6 @@ function confirmTransition() {
     return obj
 }
 
-
 /**
  * Function that adds an "scope" to the system, an scope helps the camera movement
  */
@@ -971,43 +923,30 @@ function addScope() {
     scene.add(scope);
 }
 
-
-
 /**
  * Function that detect the collision between the trees and the "targets"
  */
-
 function detectCollision() {
     let collision = false
-
-
 
     for (const target of targets) {
         target.collision = false
     }
 
-
     for (let i = 0; i < targets.length; i++) {
         collision = false
         if (targets[i].objType == "hostile") {
             for (let j = 0; j < trees.length; j++) {
-
-
                 for (const children of trees[j].children) {
-
                     var BBox = new THREE.Box3().setFromObject(children);
                     var BBox2 = new THREE.Box3().setFromObject(targets[i].obj);
                     collision = BBox.intersectsBox(BBox2)
-
-
 
                     if (collision) {
                         targets[i].collision = true
                         break;
                     }
-
                 }
-
                 if (collision) {
                     break;
                 }
@@ -1015,11 +954,9 @@ function detectCollision() {
         }
     }
 
-
     for (const target of targets) {
         if (target.objType == "hostile") {
             if (target.collision == true) {
-
                 if (target.vel > 0) {
                     target.obj.position.x += 0.05
                 } else {
@@ -1029,71 +966,9 @@ function detectCollision() {
             } else {
                 target.velZ = 0.1
             }
-
         }
     }
-
-
-
 }
-
-
-/**
- * Function that creates the "bunker" that the player is 
- */
-function createBunker() {
-    let bWidth = 80
-    let height = 2 // 8 
-    let wallsDeep = 2
-    compBunker = new THREE.Object3D();
-
-    // back wall
-    let geometry = new THREE.BoxGeometry(bWidth, height, wallsDeep);
-    let material = new THREE.MeshPhongMaterial({
-        color: "red"
-    });
-    bunker.bWall = new THREE.Mesh(geometry, material);
-    compBunker.add(bunker.bWall)
-
-
-    //  left wall
-    geometry = new THREE.BoxGeometry(wallsDeep, height, 40);
-    bunker.lWall = new THREE.Mesh(geometry, material);
-    compBunker.add(bunker.lWall)
-    bunker.lWall.position.x = -bWidth / 2
-    bunker.lWall.position.z = -19
-
-
-    // right wall
-    bunker.rWall = new THREE.Mesh(geometry, material);
-    compBunker.add(bunker.rWall)
-    bunker.rWall.position.x = bWidth / 2
-    bunker.rWall.position.z = -19
-
-    // front bottom 
-    geometry = new THREE.BoxGeometry(bWidth, 4 / 8, wallsDeep);
-    bunker.bfWall = new THREE.Mesh(geometry, material);
-    compBunker.add(bunker.bfWall)
-    bunker.bfWall.position.z = -38
-    bunker.bfWall.position.y = -0.8
-
-    //  roof
-    // geometry = new THREE.BoxGeometry(bWidth, 4 / 3, 40);
-    // bunker.roof = new THREE.Mesh(geometry, material);
-    // compBunker.add(bunker.roof)
-    // bunker.roof.position.z = -20
-    // bunker.roof.position.y = 6 - 1.5
-
-    //  bunker place
-    compBunker.position.y = height / 2
-    scene.add(compBunker)
-
-    compBunker.position.z = 55 + 20
-
-}
-
-
-
 
 //  Todo : This is unfinished I need to finish this boommmmm
 function terroristBoom() {
@@ -1103,16 +978,12 @@ function terroristBoom() {
             scene.remove(target.obj);
             removes.push(target.obj.name) // id of the target
             player.live -= 1
-
-
         }
     }
     for (const id of removes) {
         targets = targets.filter(target => target.obj.name != id);
     }
 }
-
-
 
 /**
  * Function that loads the guns 
@@ -1142,9 +1013,6 @@ function loadGun() {
     });
 }
 
-
-
-
 /**
  * Function that adds the revers of the scope
  * The reverseScope helps the gun turning by making it more "smooth" 
@@ -1164,15 +1032,6 @@ function addScopeMirror() {
     scopeMirror.position.z = 200
     scene.add(scopeMirror);
 }
-
-
-
-
-
-
-
-
-
 
 /**
  * Function that add a timer to the system 
@@ -1196,3 +1055,5 @@ function stopGameTimer() {
         startGameTimer()
     }
 }
+
+//+ -------------------- ESSENTIAL FUNCTIONS
