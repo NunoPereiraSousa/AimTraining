@@ -25,7 +25,7 @@ let level = 1
 
 // targets speed 
 let speed = {
-    min: 0.01,
+    min: 0.02,
     max: 0.05,
 }
 // targets speed
@@ -62,8 +62,14 @@ let trees = []
 
 
 //  timer
+
+//* Game timer related
 let timer = null
 let display = 0
+
+//* Start game timer
+let gameStartTimer = null
+let countDown = 3
 //  timer
 
 
@@ -105,6 +111,7 @@ let angle = 0
 
 // scope
 let scope = null
+let scopeMirror = null
 // scope
 
 // Score
@@ -167,7 +174,7 @@ window.onload = function init() {
 
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 110; i++) {
         createTree();
     }
 
@@ -177,6 +184,7 @@ window.onload = function init() {
     createHouse();
     textStyle();
     addScope()
+    addScopeMirror()
 
     display = 30
 
@@ -243,13 +251,19 @@ function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-
+
 
         scope.position.x = mouse.x * 40
         scope.position.y = mouse.y * 23
 
 
+        scopeMirror.position.x = mouse.x * 150
+        scopeMirror.position.y = mouse.y * 50
+
+
         camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        gun.lookAt(-scopeMirror.position.x, -scopeMirror.position.y, scopeMirror.position.z)
 
     }
 
@@ -282,7 +296,7 @@ function animate() {
 
     }
     movePLayer()
-    // console.log(camera.position.z);
+
 
     renderer.render(scene, camera)
     // $('selector').css({
@@ -358,11 +372,11 @@ function bonusScore(event) {
 document.body.addEventListener("mousedown", onMouseClick);
 document.addEventListener("mousemove", onMouseMove, false);
 
-let ballVel = 0.01;
+// let ballVel = 0.01;
 
 function targetsMove() {
     for (const target of targets) {
-        if (target.obj.position.x >= 50 || target.obj.position.x <= -50) {
+        if (target.obj.position.x >= 80 || target.obj.position.x <= -80) {
             target.vel = -target.vel
         }
 
@@ -416,7 +430,7 @@ function createLights() {
 
 // new THREE.
 
-// Todo <
+// Todo --Functions related to "people" spawn--<
 /**
  * *Create hostiles
  */
@@ -429,14 +443,14 @@ function createObstacles() {
                     color: 0xffff00
                 }));
         head.name = `head${i + 1}`
-        positionX = Math.floor(Math.random() * (50 - (-50) + 1) - 50);
+        positionX = Math.floor(Math.random() * (60 - (-60) + 1) - 60);
         positionZ = Math.floor(Math.random() * (-50 - (-60) + 1) - 60);
         head.position.set(positionX, 1.5, positionZ);
         targets.push({
             obj: head,
             vel: (Math.random() * (speed.max - speed.min) + speed.min) * dir,
             objType: "hostile",
-            velZ: 0.5,
+            velZ: 0.8,
             collision: false
         })
     }
@@ -474,7 +488,7 @@ function createCivil() {
         scene.add(civil.obj);
     }
 }
-// Todo >
+// Todo --Functions related to "people" spawn-->
 
 function createTree(i) {
     tree = new THREE.Object3D();
@@ -567,6 +581,8 @@ function degrees(radians) {
     return radians * 180 / Math.PI;
 }
 
+
+// generates random color to trees 
 function randomGreenColor() {
     // Note: the less min and max variables are, darken the green color will look like
     let max = 120;
@@ -575,6 +591,7 @@ function randomGreenColor() {
     return `rgb(0, ${green}, 0)`
 }
 
+// Makes the scene responsive
 function responsiveScene() {
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -645,6 +662,10 @@ function inGame() {
     }
 
     if (player.shot == 0) {
+        return false
+    }
+
+    if (player.live == 0) {
         return false
     }
     return true
@@ -721,7 +742,7 @@ function humanShieldConfirm() {
  */
 
 function startTimer() {
-    // alert('invoked')
+
     timer = window.setTimeout(
         function () {
             display--
@@ -743,7 +764,7 @@ function stopTimer() {
  * Function that alter changes de "Time that the person need to complete an level"
  */
 function levelTimer() {
-    display += (5 + level)
+    display += (20 + level)
 }
 
 
@@ -778,10 +799,16 @@ function movePLayer() {
             camera.position.z -= player.speed * Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * Math.cos(camera.rotation.y)
+
+
+
+            // !!!!!!!!!1
+            scopeMirror.position.z -= player.speed * Math.cos(camera.rotation.y)
+
+
             // gun positioning
             gun.position.z -= player.speed * Math.cos(camera.rotation.y)
             gun.position.x -= player.speed * Math.sin(camera.rotation.y)
-            gun.position.y = 3.5
 
         }
         // S 
@@ -790,10 +817,13 @@ function movePLayer() {
             camera.position.z -= player.speed * -Math.cos(camera.rotation.y)
             camera.position.x -= player.speed * -Math.sin(camera.rotation.y)
             scope.position.z -= player.speed * -Math.cos(camera.rotation.y)
+
+
+
+            scopeMirror.position.z -= player.speed * -Math.cos(camera.rotation.y)
             // gun positioning 
             gun.position.z -= player.speed * -Math.cos(camera.rotation.y)
             gun.position.x -= player.speed * -Math.sin(camera.rotation.y)
-            gun.position.y = 3.5
         }
         // A
         if (keys[65] == true && obj.a) {
@@ -814,30 +844,53 @@ function movePLayer() {
             // gun positioning
             gun.position.z -= player.speed * Math.sin(camera.rotation.y)
             gun.position.x -= player.speed * -Math.cos(camera.rotation.y)
-
-
-
         }
 
 
         //   left
         if (keys[81] == true) {
             camera.rotation.y += Math.PI * 0.01
-            gun.rotation.y += Math.PI * 0.002
+            gun.rotation.y += Math.PI * 0.01
         }
 
         //   right
         if (keys[69] == true) {
             camera.rotation.y -= Math.PI * 0.01
-            gun.rotation.y -= Math.PI * 0.002
+            gun.rotation.y -= Math.PI * 0.01
         }
     }
 
-    // it is need to press the z to place the "bipod" to start the game
+    // it is need to press the "SPACE BAR" to place the "bipod" to start the game
     if (keys[32] == true && gameInProgress == false) {
+
+
+
+        let time = 0
+
+        do {
+            gun.visible = true
+            if (time == 10000) {
+                countDown--
+            }
+            if (time == 20000) {
+                countDown--
+            }
+            if (time == 30000) {
+                countDown--
+            }
+            console.log(time);
+
+            time++
+
+        } while (countDown != 0);
+
+
+
+        countDown = 3
         gameInProgress = true
         createObstacles();
         createCivil()
+
         startTimer()
     }
 
@@ -873,30 +926,31 @@ function confirmTransition() {
 
 
 
-    if (countWz < 51 || countWz > 60) {
+
+    if (countWz < 41.5 || countWz > 72) {
         obj.w = false
     }
 
-    if (countSz < 51 || countSz > 60) {
+    if (countSz < 41.5 || countSz > 72) {
         obj.s = false
     }
-    if (countAz < 51 || countAz > 60) {
+    if (countAz < 41.5 || countAz > 72) {
         obj.a = false
     }
-    if (countDz < 51 || countDz > 60) {
+    if (countDz < 41.5 || countDz > 72) {
         obj.d = false
     }
 
-    if (countWx < -25 || countWx > 25) {
+    if (countWx < -38 || countWx > 38) {
         obj.w = false
     }
-    if (countSx < -25 || countSx > 25) {
+    if (countSx < -38 || countSx > 38) {
         obj.s = false
     }
-    if (countAx < -25 || countAx > 25) {
+    if (countAx < -38 || countAx > 38) {
         obj.a = false
     }
-    if (countDx < -25 || countDx > 25) {
+    if (countDx < -38 || countDx > 38) {
         obj.d = false
     }
     return obj
@@ -1045,11 +1099,11 @@ function createBunker() {
 function terroristBoom() {
     let removes = []
     for (const target of targets) {
-        if (target.objType == "hostile" && (target.obj.position.z >= 50)) {
+        if (target.objType == "hostile" && (target.obj.position.z >= 40)) {
             scene.remove(target.obj);
             removes.push(target.obj.name) // id of the target
             player.live -= 1
-            console.log(`boom: ${player.live} `);
+
 
         }
     }
@@ -1062,10 +1116,9 @@ function terroristBoom() {
 
 /**
  * Function that loads the guns 
- * 
+ * The gun is just an addition to the game
  */
 function loadGun() {
-
     let mtlLoader = new THREE.MTLLoader();
     mtlLoader.load('/models/M4A1/M4A1.mtl', function (materials) {
         materials.preload();
@@ -1073,13 +1126,17 @@ function loadGun() {
         loader.setMaterials(materials);
         loader.load('/models/M4A1/M4A1.obj', function (object) {
             gun = object;
-            gun.scale.set(0.3, 0.3, 0.3);
+            gun.scale.set(0.1, 0.1, 0.1);
+
+            gun.position.z = 54
+            gun.position.y = 0.5
+            // !!!!!!!!!!!!!!!!!!!!!!!
+            gun.rotation.y = -gun.rotation.y
 
 
-            gun.position.z = 45
-            gun.position.y = 3.5
+            gun.visible = false
 
-            gun.frustumCulled = false;
+            // gun.frustumCulled = false;
             scene.add(gun);
         });
     });
@@ -1087,11 +1144,55 @@ function loadGun() {
 
 
 
-function positionGun() {
+
+/**
+ * Function that adds the revers of the scope
+ * The reverseScope helps the gun turning by making it more "smooth" 
+ */
+
+function addScopeMirror() {
+    let targetGeometry = new THREE.CircleGeometry(1, 32);
+    let targetMaterial = new THREE.MeshBasicMaterial({
+        color: "blue"
+    });
+    scopeMirror = new THREE.Mesh(targetGeometry, targetMaterial);
+    scopeMirror.name = `scopeMirror`
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!
+    scopeMirror.visible = false
+
+
+    scopeMirror.position.z = 200
+    scene.add(scopeMirror);
+}
 
 
 
 
 
 
+
+
+
+
+/**
+ * Function that add a timer to the system 
+ * if the time in the timer = 0 the player loses 
+ */
+
+function startGameTimer() {
+    // alert('invoked')
+    gameStartTimer = window.setTimeout(
+        function () {
+            countDown--
+            stopGameTimer()
+        }, 1000);
+}
+/**
+ * Function that stops the timer
+ */
+function stopGameTimer() {
+    if (countDown > 0) {
+        clearTimeout(gameStartTimer)
+        startGameTimer()
+    }
 }
