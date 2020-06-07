@@ -2,15 +2,15 @@
 <html lang="en">
 
 <head>
-  <title>Title</title>
+  <title>Leader Board</title>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="/Style/MainPage/mainPage.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../Style/Leader Board/leaderboard.css">
 </head>
 
 <body>
@@ -21,21 +21,46 @@
       </a>
     </div>
   </nav>
-  <div class="container animation position-relative pt-3">
-    <div class="row pt-5">
-      <div class="col-12 text-center pt-5">
-        <a class="btn btn-lg playGame" href="/game.html" role="button">Play Game</a>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 col-12">
+        <h3>Leader Board</h3>
       </div>
-      <div class="col-12 text-center pt-5">
-        <a class="btn btn-lg rules" href="../HTML/leaderboard.html" role="button">Leader Board</a>
-      </div>
-      <div class="col-12 text-center pt-5">
-        <a class="btn btn-lg aboutUs" href="" role="button">Information</a>
+      <div class="col-lg-6 col-12 text-center">
+        <a class="btn btn-lg back" href="../HTML/menu.html" role="button">Go back</a>
       </div>
     </div>
-    <div class="row position-absolute w-100">
+    <div class="row">
+      <div class="col-12">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+            </tr>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+            </tr>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row position-absolute">
       <div class="col-12 text-center">
-        <hr>
+        <hr class="w-100">
         <h5>Game Developed by Nuno & Tiago</h5>
         <h5>June 2020</h5>
       </div>

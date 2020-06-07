@@ -1,0 +1,173 @@
+body {
+  font-family: 'Courier New', Courier, monospace !important;
+  background-image: -webkit-gradient(linear, left top, right bottom, from(#971414), to(#20252b));
+  background-image: linear-gradient(to bottom right, #971414, #20252b);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+.container-fluid {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  opacity: 1;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  visibility: visible;
+}
+
+.container-fluid h3 {
+  position: absolute;
+  top: 5%;
+  font-weight: 600 !important;
+  letter-spacing: 16px;
+  color: #dadada;
+}
+
+.container-fluid h4 {
+  font-weight: 400;
+  bottom: 5%;
+  font-weight: 500;
+  color: #dadada;
+}
+
+.container-fluid h4 span {
+  font-weight: 200;
+}
+
+.container-fluid .loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.container-fluid .loader {
+  position: relative;
+  width: 80px;
+  margin: 100px auto;
+}
+
+.container-fluid .duo {
+  height: 20px;
+  width: 50px;
+  background: rgba(254, 254, 250, 0);
+  position: absolute;
+}
+
+.container-fluid .duo,
+.container-fluid .dot {
+  -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+  -webkit-animation-timing-function: ease-in-out;
+          animation-timing-function: ease-in-out;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+
+.container-fluid .duo1 {
+  left: 0;
+}
+
+.container-fluid .duo2 {
+  left: 30px;
+}
+
+.container-fluid .dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #dadada;
+  position: absolute;
+}
+
+.container-fluid .dot-a {
+  left: 0px;
+}
+
+.container-fluid .dot-b {
+  right: 0px;
+}
+
+.container-fluid .duo1 {
+  -webkit-animation-name: spin;
+          animation-name: spin;
+}
+
+.container-fluid .duo2 {
+  -webkit-animation-name: spin;
+          animation-name: spin;
+  animation-direction: reverse;
+}
+
+.container-fluid .duo2 .dot-b {
+  -webkit-animation-name: onOff;
+          animation-name: onOff;
+}
+
+.container-fluid .duo1 .dot-a {
+  opacity: 0;
+  -webkit-animation-name: onOff;
+          animation-name: onOff;
+  animation-direction: reverse;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  50% {
+    -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+  }
+  100% {
+    -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  50% {
+    -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+  }
+  100% {
+    -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+  }
+}
+
+@-webkit-keyframes onOff {
+  0% {
+    opacity: 0;
+  }
+  49% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes onOff {
+  0% {
+    opacity: 0;
+  }
+  49% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/*# sourceMappingURL=loading.css.map */

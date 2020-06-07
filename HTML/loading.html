@@ -11,26 +11,25 @@
     <link rel="stylesheet" href="../css/Loading Screen/loadingScreen.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="icon" type="image/png" href="/Images/favicon.png" />
+    <link rel="stylesheet" href="../Style/Loading/loading.css">
 </head>
 
 <body>
-    <div class="animation position-relative d-flex align-items-center justify-content-center">
-        <div class="container d-flex justify-content-center">
-            <div class="row position-absolute title">
-                <div class="col-12">
-                    <h3>Galactic Tetris</h3>
-                </div>
+    <div class="container-fluid loading d-flex justify-content-center align-items-center">
+        <h3>Aim Training</h3>
+        <div class="loader">
+            <div class="duo duo1">
+                <div class="dot dot-a"></div>
+                <div class="dot dot-b"></div>
             </div>
-            <div class="row position-absolute svg">
-                <div class="col-12 text-center">
-                    <svg class="mb-4">
-                        <rect width="70" height="70" />
-                    </svg>
-                    <h4>Loading...</h4>
-                </div>
+            <div class="duo duo2">
+                <div class="dot dot-a"></div>
+                <div class="dot dot-b"></div>
             </div>
         </div>
+        <h4 class="position-absolute">
+            Game Developed by Nuno & Tiago
+        </h4>
     </div>
     <!-- Optional JavaScript -->
     <script src="https://code.jquery.com/jquery-3.4.1.js"
@@ -42,8 +41,8 @@
             }, 300);
         });
         setTimeout(() => {
-            window.location = "/html/index.html";
-        }, 7000);
+            window.location = "menu.html";
+        }, 5000);
     </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

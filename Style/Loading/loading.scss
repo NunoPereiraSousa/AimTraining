@@ -1,0 +1,147 @@
+$colors: (main-color: #465C69,
+    h2Color: #f7b267,
+    activeColor: #f7b267,
+    nav-color: rgba(0, 0, 0, .4),
+    shadowNav: 0 2px 2px 0.5px rgba(32, 37, 43, 0.1),
+    font-color: rgb(218, 218, 218),
+    background-gradient-nav: linear-gradient(to bottom right, #20252b, #971414),
+    background-gradient: linear-gradient(to bottom right, #971414, #20252b));
+
+
+$text: (textColor: #20252b);
+
+body {
+    font-family: 'Courier New', Courier, monospace !important;
+    background-image: map-get($colors, background-gradient);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+.container-fluid {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    opacity: 1;
+    transition: 0.5s;
+    visibility: visible;
+
+    h3 {
+        position: absolute;
+        top: 5%;
+        font-weight: 600 !important;
+        letter-spacing: 16px;
+        color: rgb(218, 218, 218);
+    }
+
+    h4 {
+        span {
+            font-weight: 200;
+        }
+
+        font-weight: 400;
+        bottom: 5%;
+        font-weight: 500;
+        color: rgb(218, 218, 218);
+    }
+
+    .loading.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loader {
+        position: relative;
+        width: 80px;
+        margin: 100px auto;
+    }
+
+    .duo {
+        height: 20px;
+        width: 50px;
+        background: rgba(254, 254, 250, 0);
+        position: absolute;
+    }
+
+    .duo,
+    .dot {
+        animation-duration: 1s;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+    }
+
+    .duo1 {
+        left: 0;
+    }
+
+    .duo2 {
+        left: 30px;
+    }
+
+    .dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        background: rgb(218, 218, 218);
+        position: absolute;
+    }
+
+    .dot-a {
+        left: 0px;
+    }
+
+    .dot-b {
+        right: 0px;
+    }
+
+    .duo1 {
+        animation-name: spin;
+    }
+
+    .duo2 {
+        animation-name: spin;
+        animation-direction: reverse;
+    }
+
+    .duo2 .dot-b {
+        animation-name: onOff;
+    }
+
+    .duo1 .dot-a {
+        opacity: 0;
+        animation-name: onOff;
+        animation-direction: reverse;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(180deg);
+    }
+}
+
+@keyframes onOff {
+    0% {
+        opacity: 0;
+    }
+
+    49% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
