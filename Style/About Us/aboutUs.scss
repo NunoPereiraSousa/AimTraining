@@ -109,9 +109,9 @@ nav {
 }
 
 .card {
-    color: map-get($colors, font-color);
+    color: red;
     background-color: transparent !important;
-    border: 2px solid map-get($colors, main-color) !important;
+    border: 2px solid map-get($colors, background-gradient-nav) !important;
     margin-bottom: 4em;
 
     & p {
@@ -119,20 +119,20 @@ nav {
     }
 
     .card-img-top {
-        border-bottom: 1px solid map-get($colors, main-color) !important;
+        border-bottom: 1px solid map-get($colors, background-gradient-nav) !important;
     }
 
     .card-body a {
         background-color: transparent;
         color: map-get($colors, font-color);
-        border: 2px solid map-get($colors, main-color);
+        border: 2px solid map-get($colors, background-gradient-nav);
         transition: all .3s;
         font-size: 1.2rem;
 
         &:hover {
             background-color: transparent;
             color: map-get($colors, font-color);
-            border: 2px solid map-get($colors, main-color);
+            border: 2px solid map-get($colors, background-gradient-nav);
             -webkit-animation: swingSwong 1s ease;
             animation: swingSwong 1s ease;
         }
