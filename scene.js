@@ -132,7 +132,14 @@ let bunker = {
 
 }
 
-// 
+//
+
+
+
+// textures
+let civilTexture = null
+let bombersTexture = null
+// textures
 
 
 
@@ -148,7 +155,7 @@ window.onload = function init() {
     scene = new THREE.Scene();
 
     //camera
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1200);
     // position and point the camera to the center of the scene
     camera.position.set(0, 1.2, 55);
     camera.lookAt(scene.position);
@@ -207,7 +214,7 @@ function animate() {
 
         terroristBoom()
 
-        sky.rotation.y += 0.0002;
+
 
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
@@ -215,6 +222,8 @@ function animate() {
 
     }
     movePLayer()
+
+    sky.rotation.y += 0.0002;
 
     if (stopLoop == false) {
         requestAnimationFrame(animate)
@@ -287,13 +296,22 @@ function createSky() {
 }
 
 function createObstacles() {
+    if (bombersTexture == null) {
+        do {
+            bombersTexture = new THREE.TextureLoader().load("/Images/Person/suicideBomberCod.png")
+        } while (bombersTexture == null);
+    }
+
     for (let i = 0; i < 2 * level; i++) {
         let dir = Math.random() * (1 - (-1)) + -1, //!directions
             head = new THREE.Mesh(
                 new THREE.BoxGeometry(2, 3, 0.5),
                 new THREE.MeshBasicMaterial({
-                    color: 0xffff00
+                    color: "#FA8072"
                 }));
+
+
+        head.material.map = bombersTexture
         head.name = `head${i + 1}`
         positionX = Math.floor(Math.random() * (60 - (-60) + 1) - 60);
         positionZ = Math.floor(Math.random() * (-50 - (-60) + 1) - 60);
@@ -313,14 +331,21 @@ function createObstacles() {
 }
 
 function createCivil() {
+    if (civilTexture == null) {
+        do {
+            civilTexture = new THREE.TextureLoader().load("/Images/Person/trevor Philip.jpg")
+        } while (civilTexture == null);
+    }
+
 
     for (let i = 0; i < 2 * level / 2; i++) {
         let dir = Math.random() * (1 - (-1)) + -1,
             civil = new THREE.Mesh(
                 new THREE.BoxGeometry(2, 3, 0.5),
                 new THREE.MeshBasicMaterial({
-                    color: "blue"
+                    color: "#A9A9A9"
                 }));
+        civil.material.map = civilTexture
         civil.name = `civil${i + 1}`
         positionX = Math.floor(Math.random() * (40)) - 20;
         positionZ = Math.floor(Math.random() * (20 + 2)) - 5;
@@ -653,6 +678,7 @@ function levelUp() {
             createCivil()
         }
     } else {
+        saveHeightScore()
         alert(`Game over`)
         stopLoop = true
         stopTimer()
@@ -1028,7 +1054,6 @@ function loadGun() {
             // !!!!!!!!!!!!!!!!!!!!!!!
             gun.rotation.y = -gun.rotation.y
 
-
             gun.visible = false
 
             // gun.frustumCulled = false;
@@ -1078,6 +1103,27 @@ function stopGameTimer() {
         clearTimeout(gameStartTimer)
         startGameTimer()
     }
+}
+
+/**
+ * Function that saves the heights score
+ * It changes the previews height score if it has been bitten 
+ */
+function saveHeightScore() {
+    let topScorer = null
+    if (JSON.parse(localStorage.getItem("heightScorer"))) {
+
+        let topScorer = JSON.parse(localStorage.getItem("heightScorer"))
+
+        if (topScorer.points < player.points) {
+            localStorage.setItem("heightScorer", JSON.stringify(player));
+            alert("New Top Scorer")
+        }
+    } else {
+        localStorage.setItem("heightScorer", JSON.stringify(player));
+        alert("New Top Scorer")
+    }
+    JSON.parse(localStorage.getItem("logUser"))
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
