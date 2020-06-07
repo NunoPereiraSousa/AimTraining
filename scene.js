@@ -1142,3 +1142,6 @@ function reloadLocation() {
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
+
+
+// Develop and coded By "theHeistBand" (Nuno Sousa and Tiago De Pina )
