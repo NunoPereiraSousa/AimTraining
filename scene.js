@@ -678,9 +678,12 @@ function levelUp() {
             createCivil()
         }
     } else {
+
         saveHeightScore()
-        alert(`Game over`)
         stopLoop = true
+        $("#exampleModalCenter").modal()
+        // alert(`Game over`)
+
         stopTimer()
     }
 }
@@ -1110,20 +1113,32 @@ function stopGameTimer() {
  * It changes the previews height score if it has been bitten 
  */
 function saveHeightScore() {
+    player.points = score
     let topScorer = null
+    document.getElementById("NewRecord").innerHTML = ""
+
     if (JSON.parse(localStorage.getItem("heightScorer"))) {
 
         let topScorer = JSON.parse(localStorage.getItem("heightScorer"))
 
         if (topScorer.points < player.points) {
             localStorage.setItem("heightScorer", JSON.stringify(player));
-            alert("New Top Scorer")
+            document.getElementById("NewRecord").innerHTML = "New Hight Score"
+            // alert("New Top Scorer")
         }
     } else {
         localStorage.setItem("heightScorer", JSON.stringify(player));
-        alert("New Top Scorer")
+        document.getElementById("NewRecord").innerHTML = "New Hight Score"
     }
-    JSON.parse(localStorage.getItem("logUser"))
+
+    document.getElementById("points").innerHTML = player.points
+    // document.getElementById("btnRestart").addEventListener("onclick", reloadLocation()) // not waiting it is pushing alone 
+}
+
+
+
+function reloadLocation() {
+    location.reload();
 }
 
 //+ -------------------- ESSENTIAL FUNCTIONS
