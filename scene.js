@@ -181,7 +181,7 @@ window.onload = function init() {
     createPlane();
     createBunker()
     createHouse();
-    // createEnemy();
+    createEnemy();
     createSky();
     textStyle();
     addScope();
