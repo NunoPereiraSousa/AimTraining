@@ -13,6 +13,8 @@ let civil;
 let civilians = []
 let house;
 let sky;
+
+let hostile, rightArm, leftArm, shoulderRight, shoulderLeft;
 // objects
 
 // level
@@ -22,6 +24,8 @@ let level = 1
 
 //  player speed
 // let playerSpeed = 0.5
+let vel = 0.02;
+let vel2 = 0.02;
 //  player speed
 
 // targets speed 
@@ -131,17 +135,12 @@ let bunker = {
     bfWall: null
 
 }
-
 //
-
-
 
 // textures
 let civilTexture = null
 let bombersTexture = null
 // textures
-
-
 
 //  !test variables: 
 let gun = null
@@ -182,6 +181,7 @@ window.onload = function init() {
     createPlane();
     createBunker()
     createHouse();
+    // createEnemy();
     createSky();
     textStyle();
     addScope();
@@ -214,7 +214,15 @@ function animate() {
 
         terroristBoom()
 
+        if (shoulderRight.rotation.z > Math.PI / 4 || shoulderRight.rotation.z < -Math.PI / 4) {
+            vel = -vel                                
+        }
+        shoulderRight.rotation.z += vel;
 
+        if (shoulderLeft.rotation.z > Math.PI / 4 || shoulderLeft.rotation.z < -Math.PI / 4) {
+            vel2 = -vel2                               
+        }
+        shoulderLeft.rotation.z += vel2;
 
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
@@ -328,6 +336,34 @@ function createObstacles() {
     for (const target of targets) {
         scene.add(target.obj);
     }
+}
+
+function createEnemy() {
+    body = new THREE.Mesh(new THREE.CubeGeometry(1, 2, 1), new THREE.MeshBasicMaterial({
+        color: "#FA8072"
+    }));
+    scene.add(body);
+    body.position.set(0, 1, 0);
+
+    shoulderRight = new THREE.Object3D();
+    body.add(shoulderRight);
+    shoulderRight.position.set(0.4, 0, 0);
+
+    shoulderLeft = new THREE.Object3D();
+    body.add(shoulderLeft);
+    shoulderLeft.position.set(-0.4, 0, 0);
+
+    leftArm = new THREE.Mesh(new THREE.CubeGeometry(1, 0.3, 1), new THREE.MeshBasicMaterial({
+        color: "#FA8072"
+    }));
+    shoulderRight.add(leftArm);
+    leftArm.position.set(0.5, 0, 0);
+
+    rightArm = new THREE.Mesh(new THREE.CubeGeometry(1, 0.3, 1), new THREE.MeshBasicMaterial({
+        color: "#FA8072"
+    }));
+    shoulderLeft.add(rightArm);
+    rightArm.position.set(-0.5, 0, 0);
 }
 
 function createCivil() {
