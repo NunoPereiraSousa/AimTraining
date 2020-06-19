@@ -142,6 +142,13 @@ let civilTexture = null
 let bombersTexture = null
 // textures
 
+
+// !!!!bad Idea
+// Saves all the shoulders for the animation
+// let shouldersLeft = []
+// let shoulderRight = []
+// Saves all the shoulders for the animation
+
 //  !test variables: 
 let gun = null
 // ! test variables 
@@ -181,7 +188,8 @@ window.onload = function init() {
     createPlane();
     createBunker()
     createHouse();
-    createEnemy();
+    // createEnemy();
+    createBunker()
     createSky();
     textStyle();
     addScope();
@@ -213,20 +221,12 @@ function animate() {
         levelUp();
 
         terroristBoom()
+        console.log(targets[0].obj);
 
-        if (shoulderRight.rotation.z > Math.PI / 4 || shoulderRight.rotation.z < -Math.PI / 4) {
-            vel = -vel                                
-        }
-        shoulderRight.rotation.z += vel;
-
-        if (shoulderLeft.rotation.z > Math.PI / 4 || shoulderLeft.rotation.z < -Math.PI / 4) {
-            vel2 = -vel2                               
-        }
-        shoulderLeft.rotation.z += vel2;
 
         textScore.innerHTML = `Score: ${score}`;
         bulletText.innerHTML = `Bullets: ${player.shot}`;
-        createBunker()
+        moveArms()
 
     }
     movePLayer()
@@ -238,6 +238,28 @@ function animate() {
     }
 
     renderer.render(scene, camera)
+}
+
+
+// Function that makes the users arm to move 
+function moveArms() {
+    for (const target of targets) {
+        if (target.shoulderLeft && target.shoulderRight) {
+
+            if (target.shoulderRight.rotation.z > Math.PI / 4 || target.shoulderRight.rotation.z < -Math.PI / 4) {
+                target.shoulderVel1 = -target.shoulderVel1;
+            }
+            // target.shoulderRight.rotation.z += vel;
+            // todo
+            if (target.shoulderLeft.rotation.z > Math.PI / 4 || target.shoulderLeft.rotation.z < -Math.PI / 4) {
+                target.shoulderVel2 = -target.shoulderVel2
+            }
+            target.shoulderRight.rotation.z += target.shoulderVel1; // wrong movements
+            target.shoulderLeft.rotation.z += target.shoulderVel2;
+
+        }
+    }
+
 }
 
 function textStyle() {
@@ -320,6 +342,29 @@ function createObstacles() {
 
 
         head.material.map = bombersTexture
+        // Todo 
+        shoulderRight = new THREE.Object3D();
+        head.add(shoulderRight);
+        shoulderRight.position.set(0.4, 0, 0);
+
+        shoulderLeft = new THREE.Object3D();
+        head.add(shoulderLeft);
+        shoulderLeft.position.set(-0.4, 0, 0);
+
+        leftArm = new THREE.Mesh(new THREE.CubeGeometry(1, 0.3, 0.5), new THREE.MeshBasicMaterial({
+            color: "#FA8072"
+        }));
+        shoulderRight.add(leftArm);
+        leftArm.position.set(0.8, 0, 0);
+
+        rightArm = new THREE.Mesh(new THREE.CubeGeometry(1, 0.3, 0.5), new THREE.MeshBasicMaterial({
+            color: "#FA8072"
+        }));
+        shoulderLeft.add(rightArm);
+        rightArm.position.set(-0.8, 0, 0);
+        // todo
+
+
         head.name = `head${i + 1}`
         positionX = Math.floor(Math.random() * (60 - (-60) + 1) - 60);
         positionZ = Math.floor(Math.random() * (-50 - (-60) + 1) - 60);
@@ -329,7 +374,11 @@ function createObstacles() {
             vel: (Math.random() * (speed.max - speed.min) + speed.min) * dir,
             objType: "hostile",
             velZ: 0.8,
-            collision: false
+            collision: false,
+            shoulderLeft: shoulderLeft,
+            shoulderRight: shoulderRight,
+            shoulderVel1: 0.02,
+            shoulderVel2: 0.02,
         })
     }
 
@@ -598,8 +647,8 @@ function onMouseMove(event) {
         scope.position.x = mouse.x * 40
         scope.position.y = mouse.y * 23
 
-        scopeMirror.position.x = mouse.x * 150
-        scopeMirror.position.y = mouse.y * 50
+        scopeMirror.position.x = mouse.x * 200 //150
+        scopeMirror.position.y = mouse.y * 70 // 50
 
         camera.lookAt(scope.position.x, scope.position.y, scope.position.z)
         gun.lookAt(-scopeMirror.position.x, -scopeMirror.position.y, scopeMirror.position.z)
@@ -968,7 +1017,7 @@ function confirmTransition() {
     let countSz = camera.position.z - player.speed * -Math.cos(camera.rotation.y)
     let countAz = camera.position.z - player.speed * -Math.sin(camera.rotation.y)
     let countDz = camera.position.z - player.speed * Math.sin(camera.rotation.y)
-
+    // todo
     if (countWz < 41.5 || countWz > 72) {
         obj.w = false
     }
@@ -995,6 +1044,7 @@ function confirmTransition() {
     if (countDx < -38 || countDx > 38) {
         obj.d = false
     }
+    // todo
     return obj
 }
 
