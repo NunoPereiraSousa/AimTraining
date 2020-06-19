@@ -742,7 +742,6 @@ function updateSensitivity(e) {
 function levelUp() {
     if (inGame()) {
         if (ballCount == 0) {
-
             level++
             player.maxLevel = level
             playerReload()
@@ -758,17 +757,13 @@ function levelUp() {
             if (speed.max < 10) {
                 speed.max += 0.02
             }
-
             createObstacles()
             createCivil()
         }
     } else {
-
         saveHeightScore()
         stopLoop = true
         $("#exampleModalCenter").modal()
-        // alert(`Game over`)
-
         stopTimer()
     }
 }
