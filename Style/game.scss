@@ -29,7 +29,7 @@ body {
 
     .overlay {
         position: fixed;
-        background: #794c09;
+        background-image: linear-gradient(to bottom right, #971414, #20252b);
         top: 0;
         left: 0;
         width: 100%;
@@ -108,7 +108,7 @@ body {
       .overlay ul li a:focus:after,
       .overlay ul li a:active:after {
         width: 100%;
-        background: #b86371;
+        background: #20252b;
       }
       
       .overlay.open li {

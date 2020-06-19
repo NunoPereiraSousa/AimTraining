@@ -303,7 +303,7 @@ function createPlane() {
         new THREE.BoxGeometry(300, 10, 300),
         new THREE.MeshBasicMaterial({
             // map: planeTexture,
-            color: 0xDEB887,
+            color: 0x94765a,
             side: THREE.DoubleSide
         }));
     plane.position.y = -5

@@ -100,9 +100,9 @@ nav a.navbar-brand {
 }
 
 .card {
-  color: #dadada;
+  color: red;
   background-color: transparent !important;
-  border: 2px solid #465C69 !important;
+  border: 2px solid linear-gradient(to bottom right, #20252b, #971414) !important;
   margin-bottom: 4em;
 }
 
@@ -111,13 +111,13 @@ nav a.navbar-brand {
 }
 
 .card .card-img-top {
-  border-bottom: 1px solid #465C69 !important;
+  border-bottom: 1px solid linear-gradient(to bottom right, #20252b, #971414) !important;
 }
 
 .card .card-body a {
   background-color: transparent;
   color: #dadada;
-  border: 2px solid #465C69;
+  border: 2px solid linear-gradient(to bottom right, #20252b, #971414);
   -webkit-transition: all .3s;
   transition: all .3s;
   font-size: 1.2rem;
@@ -126,7 +126,7 @@ nav a.navbar-brand {
 .card .card-body a:hover {
   background-color: transparent;
   color: #dadada;
-  border: 2px solid #465C69;
+  border: 2px solid linear-gradient(to bottom right, #20252b, #971414);
   -webkit-animation: swingSwong 1s ease;
   animation: swingSwong 1s ease;
 }

@@ -29,7 +29,8 @@ body {
 
 .container-fluid .overlay {
   position: fixed;
-  background: #794c09;
+  background-image: -webkit-gradient(linear, left top, right bottom, from(#971414), to(#20252b));
+  background-image: linear-gradient(to bottom right, #971414, #20252b);
   top: 0;
   left: 0;
   width: 100%;
@@ -116,7 +117,7 @@ body {
 .container-fluid .overlay ul li a:focus:after,
 .container-fluid .overlay ul li a:active:after {
   width: 100%;
-  background: #b86371;
+  background: #20252b;
 }
 
 .container-fluid .overlay.open li {
